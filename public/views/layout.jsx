@@ -1,0 +1,76 @@
+/*-------------------------------------------------------------------------------------------------------------------*\
+ |  Copyright (C) 2015 PayPal                                                                                          |
+ |                                                                                                                     |
+ |  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance     |
+ |  with the License.                                                                                                  |
+ |                                                                                                                     |
+ |  You may obtain a copy of the License at                                                                            |
+ |                                                                                                                     |
+ |       http://www.apache.org/licenses/LICENSE-2.0                                                                    |
+ |                                                                                                                     |
+ |  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed   |
+ |  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for  |
+ |  the specific language governing permissions and limitations under the License.                                     |
+ \*-------------------------------------------------------------------------------------------------------------------*/
+
+'use strict';
+
+var React = require('react');
+
+module.exports = React.createClass({
+
+    render: function render() {
+
+        return (
+            <html>
+                <head>
+                    <meta charSet='utf-8' />
+                    <title>{this.props.title}</title>
+                    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' />
+                    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' />
+                    <link rel='stylesheet' href='app.min.css' />
+                </head>
+                <body>
+                  <div className='container'>
+                    <nav>
+                      <div className='container-fluid'>
+                        <div className='navbar-header'>
+                          <button type='button' className='navbar-toggle collapsed' data-toggle='collapse' data-target='#auto-navbar' aria-expanded='false' >
+                            <span className='icon-bar'></span>
+                            <span className='icon-bar'></span>
+                            <span className='icon-bar'></span>
+                          </button>
+                        </div>
+                        <div className='collapse navbar-collapse' id='auto-navbar'>
+                          <ul className='nav navbar-nav'>
+                            <li><a href='#'>Home</a></li>
+                            <li><a href='#'>Research</a></li>
+                            <li><a href='#'>New Inventory</a></li>
+                            <li><a href='#'>Pre-Owned</a></li>
+                            <li><a href='#'>Service</a></li>
+                            <li><a href='#'>Contact Us</a></li>
+                          </ul>
+                          <ul className='nav navbar-nav navbar-right'>
+                            <li><button className='btn btn-default nav-btn'><i className="fa fa-comments-o" aria-hidden="true"></i> CHAT NOW</button></li>
+                            <li className='vertical-divider'></li>
+                            <li className='navbar-text'><i className="fa fa-phone" aria-hidden="true"></i> (877) 909-1919</li>
+                            <li className='vertical-divider'></li>
+                            <li className='navbar-text'><i className="fa fa-map-marker" aria-hidden="true"></i> ZAuto West Hollywood, CA</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </nav>
+                    <div className='logo-landing'>
+                      <img src='img/logo-landing.png'/>
+                      <h1>West Hollywood <small>ZAuto</small></h1>
+                    </div>
+                    {this.props.children}
+                  </div>
+                  <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+                  <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+                  <script src='/bundle.js'></script>
+                </body>
+            </html>
+        );
+    }
+});
