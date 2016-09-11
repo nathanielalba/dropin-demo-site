@@ -26883,7 +26883,8 @@ var Index = React.createClass({displayName: "Index",
 
   componentDidMount: function() {
     $("#featured-cars").owlCarousel({
-      items: 1
+      items: 1,
+      autoplay: 3000
     });
   },
 
@@ -26891,14 +26892,10 @@ var Index = React.createClass({displayName: "Index",
     return (
       React.createElement("div", null, 
         React.createElement("div", {id: "featured-cars", className: "owl-carousel"}, 
-          React.createElement("div", {className: "featured-car"}, React.createElement("img", {src: this.props.cars[0].images[0]})), 
-          React.createElement("div", {className: "featured-car"}, React.createElement("img", {src: this.props.cars[1].images[0]})), 
-          React.createElement("div", {className: "featured-car"}, React.createElement("img", {src: this.props.cars[2].images[0]})), 
-          React.createElement("div", {className: "featured-car"}, React.createElement("img", {src: this.props.cars[3].images[0]})), 
-          React.createElement("div", null, "TESTING THIS"), 
-          React.createElement("div", null, "TESTING THIS"), 
-          React.createElement("div", null, "TESTING THIS"), 
-          React.createElement("div", null, "TESTING THIS")
+          React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[0].images[0]})), 
+          React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[1].images[0]})), 
+          React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[2].images[0]})), 
+          React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[3].images[0]}))
         ), 
 
         React.createElement("div", {className: "car-box-menu"}, 

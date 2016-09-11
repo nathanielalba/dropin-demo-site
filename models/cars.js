@@ -34,7 +34,7 @@ module.exports = function CarsModel() {
             price: 25000
           },
           {
-            images: ['http://static.usnews.rankingsandreviews.com/images/Auto/custom/13080/2016_Nissan_Sentra_3.jpg'],
+            images: ['http://autonxt.net/wp-content/uploads/2016/02/2016-Nissan-Sentra19.jpg'],
             vin: '4',
             make: 'Nissan',
             model: 'Sentra',

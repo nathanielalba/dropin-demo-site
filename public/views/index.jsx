@@ -6,7 +6,8 @@ var Index = React.createClass({
 
   componentDidMount: function() {
     $("#featured-cars").owlCarousel({
-      items: 1
+      items: 1,
+      autoplay: 3000
     });
   },
 
@@ -14,14 +15,10 @@ var Index = React.createClass({
     return (
       <div>
         <div id='featured-cars' className='owl-carousel'>
-          <div className='featured-car'><img src={this.props.cars[0].images[0]}></img></div>
-          <div className='featured-car'><img src={this.props.cars[1].images[0]}></img></div>
-          <div className='featured-car'><img src={this.props.cars[2].images[0]}></img></div>
-          <div className='featured-car'><img src={this.props.cars[3].images[0]}></img></div>
-          <div>TESTING THIS</div>
-          <div>TESTING THIS</div>
-          <div>TESTING THIS</div>
-          <div>TESTING THIS</div>
+          <div className='item'><img src={this.props.cars[0].images[0]} /></div>
+          <div className='item'><img src={this.props.cars[1].images[0]} /></div>
+          <div className='item'><img src={this.props.cars[2].images[0]} /></div>
+          <div className='item'><img src={this.props.cars[3].images[0]} /></div>
         </div>
 
         <div className='car-box-menu'>
