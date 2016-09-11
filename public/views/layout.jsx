@@ -28,6 +28,7 @@ module.exports = React.createClass({
                     <title>{this.props.title}</title>
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' />
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' />
+                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.css' />
                     <link rel='stylesheet' href='app.min.css' />
                 </head>
                 <body>
@@ -65,9 +66,35 @@ module.exports = React.createClass({
                       <h1>West Hollywood <small>ZAuto</small></h1>
                     </div>
                     {this.props.children}
+                    <footer>
+                      <div className='row'>
+                        <div className='col-md-offset-3 col-md-6'>
+                          <div className='col-md-4 text-center'>
+                            <ul>
+                              <li><strong>INVENTORY</strong></li>
+                              <li>New Vehicles</li>
+                              <li>Pre-Owned Vehicles</li>
+                            </ul>
+                          </div>
+                          <div className='col-md-4 text-center'>
+                            <ul>
+                              <li><strong>FINANCING</strong></li>
+                              <li>Credit Application</li>
+                            </ul>
+                          </div>
+                          <div className='col-md-4 text-center'>
+                            <ul>
+                              <li><strong>CONTACT</strong></li>
+                              <li>(877) 909-1919</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </footer>
                   </div>
                   <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
                   <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+                  <script src='https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js'></script>
                   <script src='/bundle.js'></script>
                 </body>
             </html>

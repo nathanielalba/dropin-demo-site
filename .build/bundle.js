@@ -26882,34 +26882,40 @@ var FeaturedCar = require('../components/featuredcar.jsx');
 var Index = React.createClass({displayName: "Index",
 
   componentDidMount: function() {
-    $('#featured-cars').carousel({
-      interval: 2000
-    })
-  },
-  renderFeaturedCars: function(cars) {
-    cars.map(function(car, i) {
-
+    $("#featured-cars").owlCarousel({
+      items: 1
     });
   },
+
   render: function() {
     return (
       React.createElement("div", null, 
-        React.createElement("div", {id: "featured-cars", className: "carousel slide", "data-ride": "carousel"}, 
+        React.createElement("div", {id: "featured-cars", className: "owl-carousel"}, 
+          React.createElement("div", {className: "featured-car"}, React.createElement("img", {src: this.props.cars[0].images[0]})), 
+          React.createElement("div", {className: "featured-car"}, React.createElement("img", {src: this.props.cars[1].images[0]})), 
+          React.createElement("div", {className: "featured-car"}, React.createElement("img", {src: this.props.cars[2].images[0]})), 
+          React.createElement("div", {className: "featured-car"}, React.createElement("img", {src: this.props.cars[3].images[0]})), 
+          React.createElement("div", null, "TESTING THIS"), 
+          React.createElement("div", null, "TESTING THIS"), 
+          React.createElement("div", null, "TESTING THIS"), 
+          React.createElement("div", null, "TESTING THIS")
+        ), 
 
-          React.createElement("div", {className: "carousel-inner", role: "listbox"}, 
-            React.createElement("div", {className: "item active"}, 
-              React.createElement("img", {src: "https://upload.wikimedia.org/wikipedia/commons/5/55/07-08_Toyota_Camry_XLE.jpg"}), 
-              React.createElement("div", {className: "carousel-caption"}, 
-                React.createElement("p", null, this.props.cars[0].make)
+        React.createElement("div", {className: "car-box-menu"}, 
+          React.createElement("div", {className: "row"}, 
+            React.createElement("div", {className: "col-md-offset-2 col-md-8"}, 
+              React.createElement("ul", null, 
+                React.createElement("li", null, 
+                  React.createElement("a", {href: "#"}, 
+                    React.createElement("div", null
+
+                    )
+                  )
+                ), 
+                React.createElement("li", null, React.createElement("a", {href: "#"})), 
+                React.createElement("li", null, React.createElement("a", {href: "#"}))
               )
             )
-          ), 
-
-          React.createElement("a", {className: "left carousel-control", href: "#featured-cars", role: "button", "data-slide": "prev"}, 
-            React.createElement("span", {className: "glyphicon glyphicon-chevron-left", "aria-hidden": "true"})
-          ), 
-          React.createElement("a", {className: "right carousel-control", href: "#featured-cars", role: "button", "data-slide": "next"}, 
-            React.createElement("span", {className: "glyphicon glyphicon-chevron-right", "aria-hidden": "true"})
           )
         )
       )
@@ -26951,6 +26957,7 @@ module.exports = React.createClass({displayName: "exports",
                     React.createElement("title", null, this.props.title), 
                     React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"}), 
                     React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"}), 
+                    React.createElement("link", {rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.css"}), 
                     React.createElement("link", {rel: "stylesheet", href: "app.min.css"})
                 ), 
                 React.createElement("body", null, 
@@ -26987,10 +26994,36 @@ module.exports = React.createClass({displayName: "exports",
                       React.createElement("img", {src: "img/logo-landing.png"}), 
                       React.createElement("h1", null, "West Hollywood ", React.createElement("small", null, "ZAuto"))
                     ), 
-                    this.props.children
+                    this.props.children, 
+                    React.createElement("footer", null, 
+                      React.createElement("div", {className: "row"}, 
+                        React.createElement("div", {className: "col-md-offset-3 col-md-6"}, 
+                          React.createElement("div", {className: "col-md-4 text-center"}, 
+                            React.createElement("ul", null, 
+                              React.createElement("li", null, React.createElement("strong", null, "INVENTORY")), 
+                              React.createElement("li", null, "New Vehicles"), 
+                              React.createElement("li", null, "Pre-Owned Vehicles")
+                            )
+                          ), 
+                          React.createElement("div", {className: "col-md-4 text-center"}, 
+                            React.createElement("ul", null, 
+                              React.createElement("li", null, React.createElement("strong", null, "FINANCING")), 
+                              React.createElement("li", null, "Credit Application")
+                            )
+                          ), 
+                          React.createElement("div", {className: "col-md-4 text-center"}, 
+                            React.createElement("ul", null, 
+                              React.createElement("li", null, React.createElement("strong", null, "CONTACT")), 
+                              React.createElement("li", null, "(877) 909-1919")
+                            )
+                          )
+                        )
+                      )
+                    )
                   ), 
                   React.createElement("script", {src: "https://code.jquery.com/jquery-2.2.4.min.js"}), 
                   React.createElement("script", {src: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"}), 
+                  React.createElement("script", {src: "https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js"}), 
                   React.createElement("script", {src: "/bundle.js"})
                 )
             )
