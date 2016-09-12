@@ -29,7 +29,7 @@ module.exports = React.createClass({
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' />
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' />
                     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/assets/owl.carousel.min.css' />
-                    <link rel='stylesheet' href='app.min.css' />
+                    <link rel='stylesheet' href='http://lvh.me:8000/app.min.css' />
                 </head>
                 <body>
                   <div>
@@ -63,16 +63,17 @@ module.exports = React.createClass({
                         </div>
                       </nav>
                       <div className='logo-landing'>
-                        <img src='img/logo-landing.png'/>
+                        <img src='https://salesdemo.dropinauto.com/images/logo-landing.png'/>
                         <h1>West Hollywood <small>ZAuto</small></h1>
                       </div>
                     </div>
+                    <div className='full-width-border'></div>
                     {this.props.children}
                     <footer>
                       <div className='row'>
                         <div className='col-md-offset-3 col-md-6'>
                           <div className='col-md-3 text-center footer-image'>
-                            <img src='img/logo-landing.png' />
+                            <img src='https://salesdemo.dropinauto.com/images/logo-landing.png' />
                           </div>
                           <div className='col-md-3 text-center'>
                             <ul>
@@ -100,7 +101,7 @@ module.exports = React.createClass({
                   <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
                   <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
                   <script src='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/owl.carousel.min.js'></script>
-                  <script src='/bundle.js'></script>
+                  <script src='http://lvh.me:8000/bundle.js'></script>
                 </body>
             </html>
         );

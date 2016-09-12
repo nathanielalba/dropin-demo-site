@@ -26820,7 +26820,7 @@ var Client = require('react-engine/lib/client');
 // Include all view files. Browerify doesn't do
 // this automatically as it can only operate on
 // static require statements.
-require('./views/account.jsx');require('./views/index.jsx');require('./views/layout.jsx');require('./views/server.jsx');
+require('./views/cardetail.jsx');require('./views/carlist.jsx');require('./views/index.jsx');require('./views/layout.jsx');require('./views/server.jsx');
 
 // boot options
 var options = {
@@ -26837,44 +26837,39 @@ document.addEventListener('DOMContentLoaded', function onLoad() {
 });
 
 
-},{"../routes/react.jsx":273,"./views/account.jsx":269,"./views/index.jsx":270,"./views/layout.jsx":271,"./views/server.jsx":272,"react-engine/lib/client":76}],269:[function(require,module,exports){
-/*-------------------------------------------------------------------------------------------------------------------*\
-|  Copyright (C) 2015 PayPal                                                                                          |
-|                                                                                                                     |
-|  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance     |
-|  with the License.                                                                                                  |
-|                                                                                                                     |
-|  You may obtain a copy of the License at                                                                            |
-|                                                                                                                     |
-|       http://www.apache.org/licenses/LICENSE-2.0                                                                    |
-|                                                                                                                     |
-|  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed   |
-|  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for  |
-|  the specific language governing permissions and limitations under the License.                                     |
-\*-------------------------------------------------------------------------------------------------------------------*/
-
-'use strict';
-
+},{"../routes/react.jsx":274,"./views/cardetail.jsx":269,"./views/carlist.jsx":270,"./views/index.jsx":271,"./views/layout.jsx":272,"./views/server.jsx":273,"react-engine/lib/client":76}],269:[function(require,module,exports){
 var React = require('react');
 
-module.exports = React.createClass({
-
-  displayName: 'account',
-
-  render: function render() {
-
+var CarDetail = React.createClass({displayName: "CarDetail",
+  render: function() {
     return (
-      React.createElement("div", {id: "account"}, 
-        React.createElement("h1", null, this.props.name), 
-        React.createElement("h6", null, "I am a React Router rendered view"), 
-        React.createElement("a", {href: "/server"}, "Click to go to a non-react-router rendered view")
+      React.createElement("div", null, 
+        "THIS IS THE CAR DETAIL"
       )
     );
   }
 });
 
+module.exports = CarDetail;
+
 
 },{"react":265}],270:[function(require,module,exports){
+var React = require('react');
+
+var CarList = React.createClass({displayName: "CarList",
+  render: function() {
+    return (
+      React.createElement("div", null, 
+        "THIS IS CARLIST"
+      )
+    )
+  }
+})
+
+module.exports = CarList;
+
+
+},{"react":265}],271:[function(require,module,exports){
 var React = require('react');
 
 var FeaturedCar = require('../components/featuredcar.jsx');
@@ -26963,7 +26958,7 @@ var Index = React.createClass({displayName: "Index",
 module.exports = Index;
 
 
-},{"../components/featuredcar.jsx":267,"react":265}],271:[function(require,module,exports){
+},{"../components/featuredcar.jsx":267,"react":265}],272:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -26995,7 +26990,7 @@ module.exports = React.createClass({displayName: "exports",
                     React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"}), 
                     React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"}), 
                     React.createElement("link", {rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/assets/owl.carousel.min.css"}), 
-                    React.createElement("link", {rel: "stylesheet", href: "app.min.css"})
+                    React.createElement("link", {rel: "stylesheet", href: "http://lvh.me:8000/app.min.css"})
                 ), 
                 React.createElement("body", null, 
                   React.createElement("div", null, 
@@ -27029,16 +27024,17 @@ module.exports = React.createClass({displayName: "exports",
                         )
                       ), 
                       React.createElement("div", {className: "logo-landing"}, 
-                        React.createElement("img", {src: "img/logo-landing.png"}), 
+                        React.createElement("img", {src: "https://salesdemo.dropinauto.com/images/logo-landing.png"}), 
                         React.createElement("h1", null, "West Hollywood ", React.createElement("small", null, "ZAuto"))
                       )
                     ), 
+                    React.createElement("div", {className: "full-width-border"}), 
                     this.props.children, 
                     React.createElement("footer", null, 
                       React.createElement("div", {className: "row"}, 
                         React.createElement("div", {className: "col-md-offset-3 col-md-6"}, 
                           React.createElement("div", {className: "col-md-3 text-center footer-image"}, 
-                            React.createElement("img", {src: "img/logo-landing.png"})
+                            React.createElement("img", {src: "https://salesdemo.dropinauto.com/images/logo-landing.png"})
                           ), 
                           React.createElement("div", {className: "col-md-3 text-center"}, 
                             React.createElement("ul", null, 
@@ -27066,7 +27062,7 @@ module.exports = React.createClass({displayName: "exports",
                   React.createElement("script", {src: "https://code.jquery.com/jquery-2.2.4.min.js"}), 
                   React.createElement("script", {src: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"}), 
                   React.createElement("script", {src: "https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/owl.carousel.min.js"}), 
-                  React.createElement("script", {src: "/bundle.js"})
+                  React.createElement("script", {src: "http://lvh.me:8000/bundle.js"})
                 )
             )
         );
@@ -27074,7 +27070,7 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 
-},{"react":265}],272:[function(require,module,exports){
+},{"react":265}],273:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27117,7 +27113,7 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 
-},{"./layout.jsx":271,"react":265}],273:[function(require,module,exports){
+},{"./layout.jsx":272,"react":265}],274:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27144,14 +27140,21 @@ var IndexRoute = ReactRouter.IndexRoute;
 
 var Layout = require('../public/views/layout.jsx');
 var Index = require('../public/views/index.jsx');
+var CarDetail = require('../public/views/cardetail.jsx');
+var CarList = require('../public/views/carlist.jsx');
 
 var routes = module.exports = (
     React.createElement(Router, {history: browserHistory}, 
         React.createElement(Route, {path: "/", component: Layout}, 
             React.createElement(IndexRoute, {component: Index})
+        ), 
+        React.createElement(Route, {path: "cars", component: Layout}, 
+          React.createElement(Route, {path: "/new", component: CarList}), 
+          React.createElement(Route, {path: "/preowned", component: CarList}), 
+          React.createElement(Route, {path: "/:vin", component: CarDetail})
         )
     )
 );
 
 
-},{"../public/views/index.jsx":270,"../public/views/layout.jsx":271,"react":265,"react-router":107}]},{},[268]);
+},{"../public/views/cardetail.jsx":269,"../public/views/carlist.jsx":270,"../public/views/index.jsx":271,"../public/views/layout.jsx":272,"react":265,"react-router":107}]},{},[268]);

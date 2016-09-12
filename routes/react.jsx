@@ -24,11 +24,18 @@ var IndexRoute = ReactRouter.IndexRoute;
 
 var Layout = require('../public/views/layout.jsx');
 var Index = require('../public/views/index.jsx');
+var CarDetail = require('../public/views/cardetail.jsx');
+var CarList = require('../public/views/carlist.jsx');
 
 var routes = module.exports = (
     <Router history={browserHistory}>
         <Route path='/' component={Layout}>
             <IndexRoute component={Index} />
+        </Route>
+        <Route path='cars' component={Layout}>
+          <Route path='/new' component={CarList} />
+          <Route path='/preowned' component={CarList} />
+          <Route path='/:vin' component={CarDetail} />
         </Route>
     </Router>
 );
