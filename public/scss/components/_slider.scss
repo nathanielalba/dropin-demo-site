@@ -1,13 +1,25 @@
 #featured-cars {
-  height: 53rem;
+  height: 50rem;
   width: 90%;
   margin: 0 auto;
   margin-bottom: 10rem;
   .item {
+    h2 {
+      display: inline;
+    }
     img {
       display: block;
       width: 100%;
-      height: 53rem;
+      height: 50rem;
+      z-index: -1;
     }
   }
+}
+
+.box-description {
+  font-size: 150%;
+}
+
+.car-description {
+  background: grayscale(70%);
 }

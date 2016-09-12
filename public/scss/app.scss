@@ -1,9 +1,14 @@
 // main files and declarations
 @import "base/base";
 
+// helper files
+@import "helpers/text_helpers";
+
 // Components import
 @import "components/navbar";
 @import "components/landing";
 @import "components/footer";
 @import "components/box";
 @import "components/slider";
+@import "components/landing_details";
+@import "components/index";

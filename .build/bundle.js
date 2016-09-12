@@ -26884,33 +26884,73 @@ var Index = React.createClass({displayName: "Index",
   componentDidMount: function() {
     $("#featured-cars").owlCarousel({
       items: 1,
-      autoplay: 2000
+      autoplay: true,
+      stopOnHover: true,
+      navigation: true
     });
   },
 
   render: function() {
     return (
-      React.createElement("div", null, 
-        React.createElement("div", {id: "featured-cars", className: "owl-carousel"}, 
-          React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[0].images[0]}), React.createElement("h4", null, "HELLO")), 
-          React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[1].images[0]})), 
-          React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[2].images[0]})), 
-          React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[3].images[0]}))
+      React.createElement("div", {className: "container main-content"}, 
+        React.createElement("div", {className: "row"}, 
+          React.createElement("div", {className: "col-md-3"}, 
+            React.createElement("p", null, 
+              "ZAuto is an auto dealership Lorem ipsum dolor sit amet, consectetur adipiscing elit." + ' ' +
+              "Nam congue nisl ac purus gravida placerat vitae sed turpis. Nunc vestibulum, velit nec" + ' ' +
+              "tincidunt dapibus, metus libero auctor ante, vel sagittis orci ex nec libero. Donec suscipit" + ' ' +
+              "purus quis elit fermentum, eu maximus lectus varius. Curabitur tempor, est id consectetur" + ' ' +
+              "blandit, justo purus congue mauris, nec bibendum urna nunc sed nisi. Morbi et diam a felis" + ' ' +
+              "tempus imperdiet nec pulvinar sem."
+            )
+          ), 
+          React.createElement("div", {className: "col-md-9"}, 
+            React.createElement("div", {id: "featured-cars", className: "owl-carousel"}, 
+              React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[0].images[0]}), 
+                React.createElement("div", {className: "car-description"}, 
+                  React.createElement("h2", {className: "box-description"}, this.props.cars[0].year, " - ", this.props.cars[0].make, " ", this.props.cars[0].model), 
+                  React.createElement("p", null, React.createElement("span", {className: "internet-price"}, "FIND OUT INTERNET PRICE"))
+                )
+              ), 
+              React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[1].images[0]})), 
+              React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[2].images[0]})), 
+              React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[3].images[0]}))
+            )
+          )
         ), 
-
         React.createElement("div", {className: "car-box-menu"}, 
           React.createElement("div", {className: "row"}, 
             React.createElement("div", {className: "col-md-offset-2 col-md-8"}, 
               React.createElement("ul", null, 
-                React.createElement("li", null, 
+                React.createElement("li", {className: "new-car"}, 
                   React.createElement("a", {href: "#"}, 
-                    React.createElement("div", null
-
+                    React.createElement("div", {className: "box"}, 
+                      React.createElement("div", {className: "box-text"}, 
+                        React.createElement("h4", null, "BROWSE"), 
+                        React.createElement("p", null, "NEW")
+                      )
                     )
                   )
                 ), 
-                React.createElement("li", null, React.createElement("a", {href: "#"})), 
-                React.createElement("li", null, React.createElement("a", {href: "#"}))
+                React.createElement("li", {className: "used-car"}, 
+                  React.createElement("a", {href: "#"}, 
+                    React.createElement("div", {className: "box"}, 
+                      React.createElement("div", {className: "box-text"}, 
+                        React.createElement("h4", null, "BROWSE"), 
+                        React.createElement("p", null, "PREOWNED")
+                      )
+                    )
+                  )
+                ), 
+                React.createElement("li", {className: "service"}, 
+                  React.createElement("a", {href: "#"}, 
+                    React.createElement("div", {className: "box"}, 
+                      React.createElement("div", {className: "box-text"}, 
+                        React.createElement("h4", null, "SERVICE")
+                      )
+                    )
+                  )
+                )
               )
             )
           )
@@ -26954,61 +26994,66 @@ module.exports = React.createClass({displayName: "exports",
                     React.createElement("title", null, this.props.title), 
                     React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"}), 
                     React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"}), 
-                    React.createElement("link", {rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.css"}), 
+                    React.createElement("link", {rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/assets/owl.carousel.min.css"}), 
                     React.createElement("link", {rel: "stylesheet", href: "app.min.css"})
                 ), 
                 React.createElement("body", null, 
-                  React.createElement("div", {className: "container"}, 
-                    React.createElement("nav", null, 
-                      React.createElement("div", {className: "container-fluid"}, 
-                        React.createElement("div", {className: "navbar-header"}, 
-                          React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", "data-target": "#auto-navbar", "aria-expanded": "false"}, 
-                            React.createElement("span", {className: "icon-bar"}), 
-                            React.createElement("span", {className: "icon-bar"}), 
-                            React.createElement("span", {className: "icon-bar"})
-                          )
-                        ), 
-                        React.createElement("div", {className: "collapse navbar-collapse", id: "auto-navbar"}, 
-                          React.createElement("ul", {className: "nav navbar-nav"}, 
-                            React.createElement("li", null, React.createElement("a", {href: "#"}, "Home")), 
-                            React.createElement("li", null, React.createElement("a", {href: "#"}, "Research")), 
-                            React.createElement("li", null, React.createElement("a", {href: "#"}, "New Inventory")), 
-                            React.createElement("li", null, React.createElement("a", {href: "#"}, "Pre-Owned")), 
-                            React.createElement("li", null, React.createElement("a", {href: "#"}, "Service")), 
-                            React.createElement("li", null, React.createElement("a", {href: "#"}, "Contact Us"))
+                  React.createElement("div", null, 
+                    React.createElement("div", {className: "container"}, 
+                      React.createElement("nav", null, 
+                        React.createElement("div", {className: "container-fluid"}, 
+                          React.createElement("div", {className: "navbar-header"}, 
+                            React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", "data-target": "#auto-navbar", "aria-expanded": "false"}, 
+                              React.createElement("span", {className: "icon-bar"}), 
+                              React.createElement("span", {className: "icon-bar"}), 
+                              React.createElement("span", {className: "icon-bar"})
+                            )
                           ), 
-                          React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
-                            React.createElement("li", null, React.createElement("button", {className: "btn btn-default nav-btn"}, React.createElement("i", {className: "fa fa-comments-o", "aria-hidden": "true"}), " CHAT NOW")), 
-                            React.createElement("li", {className: "vertical-divider"}), 
-                            React.createElement("li", {className: "navbar-text"}, React.createElement("i", {className: "fa fa-phone", "aria-hidden": "true"}), " (877) 909-1919"), 
-                            React.createElement("li", {className: "vertical-divider"}), 
-                            React.createElement("li", {className: "navbar-text"}, React.createElement("i", {className: "fa fa-map-marker", "aria-hidden": "true"}), " ZAuto West Hollywood, CA")
+                          React.createElement("div", {className: "collapse navbar-collapse", id: "auto-navbar"}, 
+                            React.createElement("ul", {className: "nav navbar-nav"}, 
+                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Home")), 
+                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Research")), 
+                              React.createElement("li", null, React.createElement("a", {href: "#"}, "New Inventory")), 
+                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Pre-Owned")), 
+                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Service")), 
+                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Contact Us"))
+                            ), 
+                            React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
+                              React.createElement("li", null, React.createElement("button", {className: "btn btn-default nav-btn"}, React.createElement("i", {className: "fa fa-comments-o", "aria-hidden": "true"}), " CHAT NOW")), 
+                              React.createElement("li", {className: "vertical-divider"}), 
+                              React.createElement("li", {className: "navbar-text"}, React.createElement("i", {className: "fa fa-phone", "aria-hidden": "true"}), " (877) 909-1919"), 
+                              React.createElement("li", {className: "vertical-divider"}), 
+                              React.createElement("li", {className: "navbar-text"}, React.createElement("i", {className: "fa fa-map-marker", "aria-hidden": "true"}), " ZAuto West Hollywood, CA")
+                            )
                           )
                         )
+                      ), 
+                      React.createElement("div", {className: "logo-landing"}, 
+                        React.createElement("img", {src: "img/logo-landing.png"}), 
+                        React.createElement("h1", null, "West Hollywood ", React.createElement("small", null, "ZAuto"))
                       )
-                    ), 
-                    React.createElement("div", {className: "logo-landing"}, 
-                      React.createElement("img", {src: "img/logo-landing.png"}), 
-                      React.createElement("h1", null, "West Hollywood ", React.createElement("small", null, "ZAuto"))
                     ), 
                     this.props.children, 
                     React.createElement("footer", null, 
                       React.createElement("div", {className: "row"}, 
                         React.createElement("div", {className: "col-md-offset-3 col-md-6"}, 
-                          React.createElement("div", {className: "col-md-4 text-center"}, 
+                          React.createElement("div", {className: "col-md-3 text-center footer-image"}, 
+                            React.createElement("img", {src: "img/logo-landing.png"})
+                          ), 
+                          React.createElement("div", {className: "col-md-3 text-center"}, 
                             React.createElement("ul", null, 
                               React.createElement("li", null, React.createElement("strong", null, "INVENTORY")), 
                               React.createElement("li", null, "New Vehicles"), 
                               React.createElement("li", null, "Pre-Owned Vehicles")
                             )
                           ), 
-                          React.createElement("div", {className: "col-md-4 text-center"}, 
+                          React.createElement("div", {className: "col-md-3 text-center"}, 
                             React.createElement("ul", null, 
                               React.createElement("li", null, React.createElement("strong", null, "FINANCING")), 
                               React.createElement("li", null, "Credit Application")
                             )
                           ), 
-                          React.createElement("div", {className: "col-md-4 text-center"}, 
+                          React.createElement("div", {className: "col-md-3 text-center"}, 
                             React.createElement("ul", null, 
                               React.createElement("li", null, React.createElement("strong", null, "CONTACT")), 
                               React.createElement("li", null, "(877) 909-1919")
@@ -27020,7 +27065,7 @@ module.exports = React.createClass({displayName: "exports",
                   ), 
                   React.createElement("script", {src: "https://code.jquery.com/jquery-2.2.4.min.js"}), 
                   React.createElement("script", {src: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"}), 
-                  React.createElement("script", {src: "https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js"}), 
+                  React.createElement("script", {src: "https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/owl.carousel.min.js"}), 
                   React.createElement("script", {src: "/bundle.js"})
                 )
             )

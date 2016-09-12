@@ -1,17 +1,58 @@
 .car-box-menu {
   margin: 0 auto;
+  margin-top: 10rem;
   width: 100%;
+
   ul {
     list-style: none;
 
     li {
+      -webkit-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.3);
+      -moz-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.3);
+      box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.3);
       color: #1abc9c;
       width: 18rem;
       height: 28rem;
-      background-color: #ecf0f1;
       display: block;
       float: left;
       margin: 2rem;
+
+      a {
+        color: white;
+      }
     }
   }
+}
+
+.box {
+  height: 100%;
+  width: 100%;
+}
+
+.box-text {
+  padding-top: 14rem;
+  padding-left: 1rem;
+  p {
+    float: right;
+    font-size: 2.5rem;
+    padding-right: .5rem;
+  }
+}
+
+.new-car {
+  background-image: -webkit-linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),url(https://wallpaperscraft.com/image/bentley_continental_gt_2014_bentley_new_cars_92951_200x300.jpg);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),url(https://wallpaperscraft.com/image/bentley_continental_gt_2014_bentley_new_cars_92951_200x300.jpg);
+  height: 100%;
+}
+
+.used-car {
+  background-image: -webkit-linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://www.thecarcrashdetective.com/wp-content/uploads/2016/03/unsplash-heath-chevrolet-200x300.jpg);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://www.thecarcrashdetective.com/wp-content/uploads/2016/03/unsplash-heath-chevrolet-200x300.jpg);
+  height: 100%;
+}
+
+.service {
+  background-image: -webkit-linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://s.hswstatic.com/gif/engine-brakes-1.jpg);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://s.hswstatic.com/gif/engine-brakes-1.jpg);
+  height: 100%;
 }

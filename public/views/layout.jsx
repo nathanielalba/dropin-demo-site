@@ -28,61 +28,66 @@ module.exports = React.createClass({
                     <title>{this.props.title}</title>
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' />
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' />
-                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.css' />
+                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/assets/owl.carousel.min.css' />
                     <link rel='stylesheet' href='app.min.css' />
                 </head>
                 <body>
-                  <div className='container'>
-                    <nav>
-                      <div className='container-fluid'>
-                        <div className='navbar-header'>
-                          <button type='button' className='navbar-toggle collapsed' data-toggle='collapse' data-target='#auto-navbar' aria-expanded='false' >
-                            <span className='icon-bar'></span>
-                            <span className='icon-bar'></span>
-                            <span className='icon-bar'></span>
-                          </button>
+                  <div>
+                    <div className='container'>
+                      <nav>
+                        <div className='container-fluid'>
+                          <div className='navbar-header'>
+                            <button type='button' className='navbar-toggle collapsed' data-toggle='collapse' data-target='#auto-navbar' aria-expanded='false' >
+                              <span className='icon-bar'></span>
+                              <span className='icon-bar'></span>
+                              <span className='icon-bar'></span>
+                            </button>
+                          </div>
+                          <div className='collapse navbar-collapse' id='auto-navbar'>
+                            <ul className='nav navbar-nav'>
+                              <li><a href='#'>Home</a></li>
+                              <li><a href='#'>Research</a></li>
+                              <li><a href='#'>New Inventory</a></li>
+                              <li><a href='#'>Pre-Owned</a></li>
+                              <li><a href='#'>Service</a></li>
+                              <li><a href='#'>Contact Us</a></li>
+                            </ul>
+                            <ul className='nav navbar-nav navbar-right'>
+                              <li><button className='btn btn-default nav-btn'><i className="fa fa-comments-o" aria-hidden="true"></i> CHAT NOW</button></li>
+                              <li className='vertical-divider'></li>
+                              <li className='navbar-text'><i className="fa fa-phone" aria-hidden="true"></i> (877) 909-1919</li>
+                              <li className='vertical-divider'></li>
+                              <li className='navbar-text'><i className="fa fa-map-marker" aria-hidden="true"></i> ZAuto West Hollywood, CA</li>
+                            </ul>
+                          </div>
                         </div>
-                        <div className='collapse navbar-collapse' id='auto-navbar'>
-                          <ul className='nav navbar-nav'>
-                            <li><a href='#'>Home</a></li>
-                            <li><a href='#'>Research</a></li>
-                            <li><a href='#'>New Inventory</a></li>
-                            <li><a href='#'>Pre-Owned</a></li>
-                            <li><a href='#'>Service</a></li>
-                            <li><a href='#'>Contact Us</a></li>
-                          </ul>
-                          <ul className='nav navbar-nav navbar-right'>
-                            <li><button className='btn btn-default nav-btn'><i className="fa fa-comments-o" aria-hidden="true"></i> CHAT NOW</button></li>
-                            <li className='vertical-divider'></li>
-                            <li className='navbar-text'><i className="fa fa-phone" aria-hidden="true"></i> (877) 909-1919</li>
-                            <li className='vertical-divider'></li>
-                            <li className='navbar-text'><i className="fa fa-map-marker" aria-hidden="true"></i> ZAuto West Hollywood, CA</li>
-                          </ul>
-                        </div>
+                      </nav>
+                      <div className='logo-landing'>
+                        <img src='img/logo-landing.png'/>
+                        <h1>West Hollywood <small>ZAuto</small></h1>
                       </div>
-                    </nav>
-                    <div className='logo-landing'>
-                      <img src='img/logo-landing.png'/>
-                      <h1>West Hollywood <small>ZAuto</small></h1>
                     </div>
                     {this.props.children}
                     <footer>
                       <div className='row'>
                         <div className='col-md-offset-3 col-md-6'>
-                          <div className='col-md-4 text-center'>
+                          <div className='col-md-3 text-center footer-image'>
+                            <img src='img/logo-landing.png' />
+                          </div>
+                          <div className='col-md-3 text-center'>
                             <ul>
                               <li><strong>INVENTORY</strong></li>
                               <li>New Vehicles</li>
                               <li>Pre-Owned Vehicles</li>
                             </ul>
                           </div>
-                          <div className='col-md-4 text-center'>
+                          <div className='col-md-3 text-center'>
                             <ul>
                               <li><strong>FINANCING</strong></li>
                               <li>Credit Application</li>
                             </ul>
                           </div>
-                          <div className='col-md-4 text-center'>
+                          <div className='col-md-3 text-center'>
                             <ul>
                               <li><strong>CONTACT</strong></li>
                               <li>(877) 909-1919</li>
@@ -94,7 +99,7 @@ module.exports = React.createClass({
                   </div>
                   <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
                   <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
-                  <script src='https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js'></script>
+                  <script src='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/owl.carousel.min.js'></script>
                   <script src='/bundle.js'></script>
                 </body>
             </html>

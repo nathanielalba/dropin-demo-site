@@ -1,8 +1,5 @@
 footer {
   background-color: #bdc3c7;
-  position: absolute;
-  left: 0;
-  bottom: 0;
   height: 16rem;
   width: 100%;
   overflow: hidden;
@@ -19,11 +16,9 @@ footer {
 }
 
 
-.footer-logo {
-  margin-top: 3rem;
-
+.footer-image {
   img {
-    display: block;
-    margin: 0 auto;
+    padding-top: 3rem;
+    float: right;
   }
 }
