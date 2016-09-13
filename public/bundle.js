@@ -26841,10 +26841,64 @@ document.addEventListener('DOMContentLoaded', function onLoad() {
 var React = require('react');
 
 var CarDetail = React.createClass({displayName: "CarDetail",
+
+  componentWillMount: function() {
+    var cars = this.props.cars;
+    var vin = this.props.params.vin;
+
+    var car = cars.filter(function(obj) {
+      if(obj.vin == vin) {
+        return obj;
+      }
+    });
+
+    car = car[0];
+
+    this.setState({
+      car: {
+        images: car.images,
+        vin: car.vin,
+        make: car.make,
+        model: car.model,
+        year: car.year,
+        featured: car.featured,
+        preowned: car.preowned,
+        price: car.price,
+        miles: car.miles
+      }
+    }, function() {
+      console.log(this.state)
+    });
+  },
+
   render: function() {
     return (
-      React.createElement("div", null, 
-        "THIS IS THE CAR DETAIL"
+      React.createElement("div", {className: "container"}, 
+        React.createElement("div", {className: "car-detail"}, 
+          React.createElement("div", {className: "row"}, 
+            React.createElement("div", {className: "col-md-8"}, 
+              React.createElement("img", {src: this.state.car.images[0]})
+            ), 
+            React.createElement("div", {className: "col-md-4"}, 
+              React.createElement("h2", null, this.state.car.year, " - ", this.state.car.make, " ", this.state.car.model), 
+              React.createElement("h6", null, "VIN#", this.state.car.vin)
+            )
+          ), 
+          React.createElement("div", {className: "detail-contact-form"}, 
+            React.createElement("h4", null, "Interested?"), 
+            React.createElement("p", null, "Our vehicle experts are standing by to answer any questions:"), 
+            React.createElement("p", null, " ", React.createElement("strong", null, "Call Us"), " (877) 909-1919"), 
+            React.createElement("form", null, 
+              React.createElement("div", {className: "form-group"}, 
+                React.createElement("input", {type: "email", className: "form-control", placeholder: "Email **"})
+              ), 
+              React.createElement("div", {className: "form-group"}, 
+                React.createElement("textarea", {className: "form-control", value: 'I am interested in the ' + this.state.car.year + ' ' + this.state.car.make + ' ' + this.state.car.model + ' VIN#' + this.state.car.vin})
+              ), 
+              React.createElement("button", {type: "submit", className: "btn btn-default btn-block"}, "Contact Us")
+            )
+          )
+        )
       )
     );
   }
@@ -26874,6 +26928,8 @@ var React = require('react');
 
 var FeaturedCar = require('../components/featuredcar.jsx');
 
+var Link = require('react-router').Link;
+
 var Index = React.createClass({displayName: "Index",
 
   componentDidMount: function() {
@@ -26889,27 +26945,84 @@ var Index = React.createClass({displayName: "Index",
     return (
       React.createElement("div", {className: "container main-content"}, 
         React.createElement("div", {className: "row"}, 
-          React.createElement("div", {className: "col-md-3"}, 
-            React.createElement("p", null, 
-              "ZAuto is an auto dealership Lorem ipsum dolor sit amet, consectetur adipiscing elit." + ' ' +
-              "Nam congue nisl ac purus gravida placerat vitae sed turpis. Nunc vestibulum, velit nec" + ' ' +
-              "tincidunt dapibus, metus libero auctor ante, vel sagittis orci ex nec libero. Donec suscipit" + ' ' +
-              "purus quis elit fermentum, eu maximus lectus varius. Curabitur tempor, est id consectetur" + ' ' +
-              "blandit, justo purus congue mauris, nec bibendum urna nunc sed nisi. Morbi et diam a felis" + ' ' +
-              "tempus imperdiet nec pulvinar sem."
+          React.createElement("div", {className: "col-md-4"}, 
+            React.createElement("div", {className: "thumbnail"}, 
+              React.createElement("img", {src: this.props.cars[0].images[0], alt: "Card image cap"}), 
+              React.createElement("div", {className: "caption"}, 
+                React.createElement("h3", null, this.props.cars[0].year, " - ", this.props.cars[0].make, " ", this.props.cars[0].model), 
+                React.createElement("p", null, "Brand ", React.createElement("strong", null, "NEW"), "!!"), 
+                React.createElement("p", null, "2.5L V4 - Automatic transmission"), 
+                React.createElement("p", null, "Luxury Edition"), 
+                React.createElement("p", null, this.props.cars[0].miles, " miles!"), 
+                React.createElement(Link, {to: '/inventory/' + this.props.cars[0].make + '/' +this.props.cars[0].vin + '/' + this.props.cars[0].model}, "FIND OUT INTERNET PRICE")
+              )
             )
           ), 
-          React.createElement("div", {className: "col-md-9"}, 
-            React.createElement("div", {id: "featured-cars", className: "owl-carousel"}, 
-              React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[0].images[0]}), 
-                React.createElement("div", {className: "car-description"}, 
-                  React.createElement("h2", {className: "box-description"}, this.props.cars[0].year, " - ", this.props.cars[0].make, " ", this.props.cars[0].model), 
-                  React.createElement("p", null, React.createElement("span", {className: "internet-price"}, "FIND OUT INTERNET PRICE"))
-                )
-              ), 
-              React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[1].images[0]})), 
-              React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[2].images[0]})), 
-              React.createElement("div", {className: "item"}, React.createElement("img", {src: this.props.cars[3].images[0]}))
+          React.createElement("div", {className: "col-md-4"}, 
+            React.createElement("div", {className: "thumbnail"}, 
+              React.createElement("img", {src: this.props.cars[1].images[0], alt: "Card image cap"}), 
+              React.createElement("div", {className: "caption"}, 
+                React.createElement("h3", null, this.props.cars[1].year, " - ", this.props.cars[1].make, " ", this.props.cars[1].model), 
+                React.createElement("p", null, React.createElement("strong", null, "Certified"), " pre-owned!"), 
+                React.createElement("p", null, "2.7L V6 - Automatic transmission"), 
+                React.createElement("p", null, "Standard Sport"), 
+                React.createElement("p", null, this.props.cars[1].miles, " miles!"), 
+                React.createElement(Link, {to: '/inventory/' + this.props.cars[1].make + '/' +this.props.cars[1].vin + '/' + this.props.cars[1].model}, "FIND OUT INTERNET PRICE")
+              )
+            )
+          ), 
+          React.createElement("div", {className: "col-md-4"}, 
+            React.createElement("div", {className: "thumbnail"}, 
+              React.createElement("img", {src: this.props.cars[2].images[0], alt: "Card image cap"}), 
+              React.createElement("div", {className: "caption"}, 
+                React.createElement("h3", null, this.props.cars[2].year, " - ", this.props.cars[2].make, " ", this.props.cars[2].model), 
+                React.createElement("p", null, React.createElement("strong", null, "Certified"), " pre-owned!"), 
+                React.createElement("p", null, "3.6L V6 - Manual transmission"), 
+                React.createElement("p", null, "Rubicon - Sports package w/ offroad tires"), 
+                React.createElement("p", null, this.props.cars[2].miles, " miles!"), 
+                React.createElement(Link, {to: '/inventory/' + this.props.cars[2].make + '/' +this.props.cars[2].vin + '/' + this.props.cars[2].model}, "FIND OUT INTERNET PRICE")
+              )
+            )
+          )
+        ), 
+        React.createElement("div", {className: "row"}, 
+          React.createElement("div", {className: "col-md-4"}, 
+            React.createElement("div", {className: "thumbnail"}, 
+              React.createElement("img", {src: this.props.cars[3].images[0], alt: "Card image cap"}), 
+              React.createElement("div", {className: "caption"}, 
+                React.createElement("h3", null, this.props.cars[3].year, " - ", this.props.cars[3].make, " ", this.props.cars[3].model), 
+                React.createElement("p", null, "Brand ", React.createElement("strong", null, "NEW"), "!!"), 
+                React.createElement("p", null, "2.5L V4 - Automatic transmission"), 
+                React.createElement("p", null, "SE-R Spec V"), 
+                React.createElement("p", null, this.props.cars[3].miles, " miles!"), 
+                React.createElement(Link, {to: '/inventory/' + this.props.cars[3].make + '/' +this.props.cars[3].vin + '/' + this.props.cars[3].model}, "FIND OUT INTERNET PRICE")
+              )
+            )
+          ), 
+          React.createElement("div", {className: "col-md-4"}, 
+            React.createElement("div", {className: "thumbnail"}, 
+              React.createElement("img", {src: this.props.cars[4].images[0], alt: "Card image cap"}), 
+              React.createElement("div", {className: "caption"}, 
+                React.createElement("h3", null, this.props.cars[4].year, " - ", this.props.cars[4].make, " ", this.props.cars[4].model), 
+                React.createElement("p", null, React.createElement("strong", null, "Certified"), " pre-owned!"), 
+                React.createElement("p", null, "3.5L V6 - Manual transmission"), 
+                React.createElement("p", null, "SE Limited"), 
+                React.createElement("p", null, this.props.cars[4].miles, " miles!"), 
+                React.createElement(Link, {to: '/inventory/' + this.props.cars[4].make + '/' +this.props.cars[4].vin + '/' + this.props.cars[4].model}, "FIND OUT INTERNET PRICE")
+              )
+            )
+          ), 
+          React.createElement("div", {className: "col-md-4"}, 
+            React.createElement("div", {className: "thumbnail"}, 
+              React.createElement("img", {src: this.props.cars[5].images[0], alt: "Card image cap"}), 
+              React.createElement("div", {className: "caption"}, 
+                React.createElement("h3", null, this.props.cars[5].year, " - ", this.props.cars[5].make, " ", this.props.cars[5].model), 
+                React.createElement("p", null, React.createElement("strong", null, "Certified"), " pre-owned!"), 
+                React.createElement("p", null, "1.8L V4 - Automatic transmission"), 
+                React.createElement("p", null, "LS"), 
+                React.createElement("p", null, this.props.cars[5].miles, " miles!"), 
+                React.createElement(Link, {to: '/inventory/' + this.props.cars[5].make + '/' +this.props.cars[5].vin + '/' + this.props.cars[5].model}, "FIND OUT INTERNET PRICE")
+              )
             )
           )
         ), 
@@ -26958,7 +27071,7 @@ var Index = React.createClass({displayName: "Index",
 module.exports = Index;
 
 
-},{"../components/featuredcar.jsx":267,"react":265}],272:[function(require,module,exports){
+},{"../components/featuredcar.jsx":267,"react":265,"react-router":107}],272:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -26977,6 +27090,7 @@ module.exports = Index;
 'use strict';
 
 var React = require('react');
+var Link = require('react-router').Link;
 
 module.exports = React.createClass({displayName: "exports",
 
@@ -27006,7 +27120,7 @@ module.exports = React.createClass({displayName: "exports",
                           ), 
                           React.createElement("div", {className: "collapse navbar-collapse", id: "auto-navbar"}, 
                             React.createElement("ul", {className: "nav navbar-nav"}, 
-                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Home")), 
+                              React.createElement("li", null, React.createElement(Link, {to: '/'}, "Home")), 
                               React.createElement("li", null, React.createElement("a", {href: "#"}, "Research")), 
                               React.createElement("li", null, React.createElement("a", {href: "#"}, "New Inventory")), 
                               React.createElement("li", null, React.createElement("a", {href: "#"}, "Pre-Owned")), 
@@ -27070,7 +27184,7 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 
-},{"react":265}],273:[function(require,module,exports){
+},{"react":265,"react-router":107}],273:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27143,15 +27257,16 @@ var Index = require('../public/views/index.jsx');
 var CarDetail = require('../public/views/cardetail.jsx');
 var CarList = require('../public/views/carlist.jsx');
 
+
+// something like local:8000/new-cars/toyota/${car-vin}/red-2016-prius
+
 var routes = module.exports = (
     React.createElement(Router, {history: browserHistory}, 
         React.createElement(Route, {path: "/", component: Layout}, 
-            React.createElement(IndexRoute, {component: Index})
-        ), 
-        React.createElement(Route, {path: "cars", component: Layout}, 
-          React.createElement(Route, {path: "/new", component: CarList}), 
-          React.createElement(Route, {path: "/preowned", component: CarList}), 
-          React.createElement(Route, {path: "/:vin", component: CarDetail})
+            React.createElement(IndexRoute, {component: Index}), 
+            React.createElement(Route, {path: "inventory"}, 
+              React.createElement(Route, {path: ":make/:vin/:model", component: CarDetail})
+            )
         )
     )
 );

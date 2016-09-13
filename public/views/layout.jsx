@@ -16,6 +16,7 @@
 'use strict';
 
 var React = require('react');
+var Link = require('react-router').Link;
 
 module.exports = React.createClass({
 
@@ -45,7 +46,7 @@ module.exports = React.createClass({
                           </div>
                           <div className='collapse navbar-collapse' id='auto-navbar'>
                             <ul className='nav navbar-nav'>
-                              <li><a href='#'>Home</a></li>
+                              <li><Link to={'/'}>Home</Link></li>
                               <li><a href='#'>Research</a></li>
                               <li><a href='#'>New Inventory</a></li>
                               <li><a href='#'>Pre-Owned</a></li>

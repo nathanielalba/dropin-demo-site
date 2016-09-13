@@ -2,6 +2,8 @@ var React = require('react');
 
 var FeaturedCar = require('../components/featuredcar.jsx');
 
+var Link = require('react-router').Link;
+
 var Index = React.createClass({
 
   componentDidMount: function() {
@@ -17,27 +19,84 @@ var Index = React.createClass({
     return (
       <div className='container main-content'>
         <div className='row'>
-          <div className='col-md-3'>
-            <p>
-              ZAuto is an auto dealership Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Nam congue nisl ac purus gravida placerat vitae sed turpis. Nunc vestibulum, velit nec
-              tincidunt dapibus, metus libero auctor ante, vel sagittis orci ex nec libero. Donec suscipit
-              purus quis elit fermentum, eu maximus lectus varius. Curabitur tempor, est id consectetur
-              blandit, justo purus congue mauris, nec bibendum urna nunc sed nisi. Morbi et diam a felis
-              tempus imperdiet nec pulvinar sem.
-            </p>
-          </div>
-          <div className='col-md-9'>
-            <div id='featured-cars' className='owl-carousel'>
-              <div className='item'><img src={this.props.cars[0].images[0]} />
-                <div className='car-description'>
-                  <h2 className='box-description'>{this.props.cars[0].year} - {this.props.cars[0].make} {this.props.cars[0].model}</h2>
-                  <p><span className='internet-price'>FIND OUT INTERNET PRICE</span></p>
-                </div>
+          <div className='col-md-4'>
+            <div className="thumbnail">
+              <img src={this.props.cars[0].images[0]} alt="Card image cap" />
+              <div className="caption">
+                <h3>{this.props.cars[0].year} - {this.props.cars[0].make} {this.props.cars[0].model}</h3>
+                <p>Brand <strong>NEW</strong>!!</p>
+                <p>2.5L V4 - Automatic transmission</p>
+                <p>Luxury Edition</p>
+                <p>{this.props.cars[0].miles} miles!</p>
+                <Link to={'/inventory/' + this.props.cars[0].make + '/' +this.props.cars[0].vin + '/' + this.props.cars[0].model }>FIND OUT INTERNET PRICE</Link>
               </div>
-              <div className='item'><img src={this.props.cars[1].images[0]} /></div>
-              <div className='item'><img src={this.props.cars[2].images[0]} /></div>
-              <div className='item'><img src={this.props.cars[3].images[0]} /></div>
+            </div>
+          </div>
+          <div className='col-md-4'>
+            <div className="thumbnail">
+              <img src={this.props.cars[1].images[0]} alt="Card image cap" />
+              <div className="caption">
+                <h3>{this.props.cars[1].year} - {this.props.cars[1].make} {this.props.cars[1].model}</h3>
+                <p><strong>Certified</strong> pre-owned!</p>
+                <p>2.7L V6 - Automatic transmission</p>
+                <p>Standard Sport</p>
+                <p>{this.props.cars[1].miles} miles!</p>
+                <Link to={'/inventory/' + this.props.cars[1].make + '/' +this.props.cars[1].vin + '/' + this.props.cars[1].model }>FIND OUT INTERNET PRICE</Link>
+              </div>
+            </div>
+          </div>
+          <div className='col-md-4'>
+            <div className="thumbnail">
+              <img src={this.props.cars[2].images[0]} alt="Card image cap" />
+              <div className="caption">
+                <h3>{this.props.cars[2].year} - {this.props.cars[2].make} {this.props.cars[2].model}</h3>
+                <p><strong>Certified</strong> pre-owned!</p>
+                <p>3.6L V6 - Manual transmission</p>
+                <p>Rubicon - Sports package w/ offroad tires</p>
+                <p>{this.props.cars[2].miles} miles!</p>
+                <Link to={'/inventory/' + this.props.cars[2].make + '/' +this.props.cars[2].vin + '/' + this.props.cars[2].model }>FIND OUT INTERNET PRICE</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className='row'>
+          <div className='col-md-4'>
+            <div className="thumbnail">
+              <img src={this.props.cars[3].images[0]} alt="Card image cap" />
+              <div className="caption">
+                <h3>{this.props.cars[3].year} - {this.props.cars[3].make} {this.props.cars[3].model}</h3>
+                <p>Brand <strong>NEW</strong>!!</p>
+                <p>2.5L V4 - Automatic transmission</p>
+                <p>SE-R Spec V</p>
+                <p>{this.props.cars[3].miles} miles!</p>
+                <Link to={'/inventory/' + this.props.cars[3].make + '/' +this.props.cars[3].vin + '/' + this.props.cars[3].model }>FIND OUT INTERNET PRICE</Link>
+              </div>
+            </div>
+          </div>
+          <div className='col-md-4'>
+            <div className="thumbnail">
+              <img src={this.props.cars[4].images[0]} alt="Card image cap" />
+              <div className="caption">
+                <h3>{this.props.cars[4].year} - {this.props.cars[4].make} {this.props.cars[4].model}</h3>
+                <p><strong>Certified</strong> pre-owned!</p>
+                <p>3.5L V6 - Manual transmission</p>
+                <p>SE Limited</p>
+                <p>{this.props.cars[4].miles} miles!</p>
+                <Link to={'/inventory/' + this.props.cars[4].make + '/' +this.props.cars[4].vin + '/' + this.props.cars[4].model }>FIND OUT INTERNET PRICE</Link>
+              </div>
+            </div>
+          </div>
+          <div className='col-md-4'>
+            <div className="thumbnail">
+              <img src={this.props.cars[5].images[0]} alt="Card image cap" />
+              <div className="caption">
+                <h3>{this.props.cars[5].year} - {this.props.cars[5].make} {this.props.cars[5].model}</h3>
+                <p><strong>Certified</strong> pre-owned!</p>
+                <p>1.8L V4 - Automatic transmission</p>
+                <p>LS</p>
+                <p>{this.props.cars[5].miles} miles!</p>
+                <Link to={'/inventory/' + this.props.cars[5].make + '/' +this.props.cars[5].vin + '/' + this.props.cars[5].model }>FIND OUT INTERNET PRICE</Link>
+              </div>
             </div>
           </div>
         </div>

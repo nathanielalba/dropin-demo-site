@@ -27,15 +27,16 @@ var Index = require('../public/views/index.jsx');
 var CarDetail = require('../public/views/cardetail.jsx');
 var CarList = require('../public/views/carlist.jsx');
 
+
+// something like local:8000/new-cars/toyota/${car-vin}/red-2016-prius
+
 var routes = module.exports = (
     <Router history={browserHistory}>
         <Route path='/' component={Layout}>
             <IndexRoute component={Index} />
-        </Route>
-        <Route path='cars' component={Layout}>
-          <Route path='/new' component={CarList} />
-          <Route path='/preowned' component={CarList} />
-          <Route path='/:vin' component={CarDetail} />
+            <Route path='inventory'>
+              <Route path=':make/:vin/:model' component={CarDetail} />
+            </Route>
         </Route>
     </Router>
 );
