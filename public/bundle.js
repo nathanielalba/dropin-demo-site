@@ -26820,7 +26820,7 @@ var Client = require('react-engine/lib/client');
 // Include all view files. Browerify doesn't do
 // this automatically as it can only operate on
 // static require statements.
-require('./views/cardetail.jsx');require('./views/carlist.jsx');require('./views/index.jsx');require('./views/layout.jsx');require('./views/server.jsx');
+require('./views/cardetail.jsx');require('./views/carlist.jsx');require('./views/creditapp.jsx');require('./views/index.jsx');require('./views/layout.jsx');require('./views/server.jsx');
 
 // boot options
 var options = {
@@ -26837,7 +26837,7 @@ document.addEventListener('DOMContentLoaded', function onLoad() {
 });
 
 
-},{"../routes/react.jsx":274,"./views/cardetail.jsx":269,"./views/carlist.jsx":270,"./views/index.jsx":271,"./views/layout.jsx":272,"./views/server.jsx":273,"react-engine/lib/client":76}],269:[function(require,module,exports){
+},{"../routes/react.jsx":275,"./views/cardetail.jsx":269,"./views/carlist.jsx":270,"./views/creditapp.jsx":271,"./views/index.jsx":272,"./views/layout.jsx":273,"./views/server.jsx":274,"react-engine/lib/client":76}],269:[function(require,module,exports){
 var React = require('react');
 
 var CarDetail = React.createClass({displayName: "CarDetail",
@@ -26864,7 +26864,11 @@ var CarDetail = React.createClass({displayName: "CarDetail",
         featured: car.featured,
         preowned: car.preowned,
         price: car.price,
-        miles: car.miles
+        miles: car.miles,
+        transmission: car.transmission,
+        engine: car.engine,
+        fuel: car.fuel,
+        title: car.title
       }
     }, function() {
       console.log(this.state)
@@ -26881,7 +26885,14 @@ var CarDetail = React.createClass({displayName: "CarDetail",
             ), 
             React.createElement("div", {className: "col-md-4"}, 
               React.createElement("h2", null, this.state.car.year, " - ", this.state.car.make, " ", this.state.car.model), 
-              React.createElement("h6", null, "VIN#", this.state.car.vin)
+              React.createElement("p", null, "Mileage: ", this.state.car.miles), 
+              React.createElement("p", null, "Transmission Type: ", this.state.car.transmission), 
+              React.createElement("p", null, "Fuel Type: ", this.state.car.fuel), 
+              React.createElement("p", null, "Engine: ", this.state.car.engine), 
+              React.createElement("p", null, "Title: ", this.state.car.title), 
+              React.createElement("p", null, "CARFAX: ", React.createElement("a", {href: "#"}, "Click for a CarFax Check!")), 
+              React.createElement("h6", null, "VIN#", this.state.car.vin), 
+              React.createElement("h3", null, "Internet Price: ", React.createElement("strong", null, "$", this.state.car.price))
             )
           ), 
           React.createElement("div", {className: "detail-contact-form"}, 
@@ -26924,6 +26935,90 @@ module.exports = CarList;
 
 
 },{"react":265}],271:[function(require,module,exports){
+var React = require('react');
+
+var CreditApp = React.createClass({displayName: "CreditApp",
+  onSubmit: function(e) {
+    e.preventDefault();
+    alert('here is the form!!');
+  },
+
+  render: function() {
+    return (
+      React.createElement("div", {className: "container"}, 
+        React.createElement("div", {className: "credit-app"}, 
+          React.createElement("form", {onSubmit: this.onSubmit}, 
+            React.createElement("h4", {className: "credit-app-header"}, "Personal Information"), 
+            React.createElement("div", {className: "form-group"}, 
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-6"}, 
+                  React.createElement("input", {type: "text", placeholder: "First Name*", className: "form-control custom-border"})
+                ), 
+                React.createElement("div", {className: "col-md-6"}, 
+                  React.createElement("input", {type: "text", placeholder: "Last Name*", className: "form-control custom-border"})
+                )
+              ), 
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-9"}, 
+                  React.createElement("input", {type: "text", placeholder: "Address*", className: "form-control custom-border"})
+                ), 
+                React.createElement("div", {className: "col-md-3"}, 
+                  React.createElement("input", {type: "text", placeholder: "Telephone #*", className: "form-control custom-border"})
+                )
+              ), 
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-3"}, 
+                  React.createElement("input", {type: "text", placeholder: "City*", className: "form-control custom-border"})
+                ), 
+                React.createElement("div", {className: "col-md-3"}, 
+                  React.createElement("input", {type: "text", placeholder: "State/Zip*", className: "form-control custom-border"})
+                ), 
+                React.createElement("div", {className: "col-md-6"}, 
+                  React.createElement("input", {type: "email", placeholder: "Email*", className: "form-control custom-border"})
+                )
+              ), 
+              React.createElement("h4", {className: "credit-app-header"}, "Employment Info"), 
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-6"}, 
+                  React.createElement("input", {type: "text", placeholder: "Company Name*", className: "form-control custom-border"})
+                ), 
+                React.createElement("div", {className: "col-md-6"}, 
+                  React.createElement("input", {type: "text", placeholder: "Telephone #*", className: "form-control custom-border"})
+                )
+              ), 
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-7"}, 
+                  React.createElement("input", {type: "text", placeholder: "Business Address*", className: "form-control custom-border"})
+                ), 
+                React.createElement("div", {className: "col-md-5"}, 
+                  React.createElement("input", {type: "text", placeholder: "Position Held*", className: "form-control custom-border"})
+                )
+              ), 
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-6"}, 
+                  React.createElement("input", {type: "text", placeholder: "Time in Position*", className: "form-control custom-border"})
+                ), 
+                React.createElement("div", {className: "col-md-6"}, 
+                  React.createElement("input", {type: "text", placeholder: "Salary", className: "form-control custom-border"}), 
+                  React.createElement("label", null, 
+                    React.createElement("input", {type: "checkbox"}), " Hourly", 
+                    React.createElement("input", {type: "checkbox"}), " Monthly"
+                  )
+                )
+              )
+            ), 
+            React.createElement("button", {type: "submit", className: "btn btn-default"}, "Submit")
+          )
+        )
+      )
+    )
+  }
+});
+
+module.exports = CreditApp;
+
+
+},{"react":265}],272:[function(require,module,exports){
 var React = require('react');
 
 var FeaturedCar = require('../components/featuredcar.jsx');
@@ -27071,7 +27166,7 @@ var Index = React.createClass({displayName: "Index",
 module.exports = Index;
 
 
-},{"../components/featuredcar.jsx":267,"react":265,"react-router":107}],272:[function(require,module,exports){
+},{"../components/featuredcar.jsx":267,"react":265,"react-router":107}],273:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27100,7 +27195,7 @@ module.exports = React.createClass({displayName: "exports",
             React.createElement("html", null, 
                 React.createElement("head", null, 
                     React.createElement("meta", {charSet: "utf-8"}), 
-                    React.createElement("title", null, this.props.title), 
+                    React.createElement("title", null, "ZAuto | West Hollywood"), 
                     React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"}), 
                     React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"}), 
                     React.createElement("link", {rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/assets/owl.carousel.min.css"}), 
@@ -27153,14 +27248,14 @@ module.exports = React.createClass({displayName: "exports",
                           React.createElement("div", {className: "col-md-3 text-center"}, 
                             React.createElement("ul", null, 
                               React.createElement("li", null, React.createElement("strong", null, "INVENTORY")), 
-                              React.createElement("li", null, "New Vehicles"), 
-                              React.createElement("li", null, "Pre-Owned Vehicles")
+                              React.createElement("li", null, React.createElement("a", {href: "#"}, "New Vehicles")), 
+                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Pre-Owned Vehicles"))
                             )
                           ), 
                           React.createElement("div", {className: "col-md-3 text-center"}, 
                             React.createElement("ul", null, 
                               React.createElement("li", null, React.createElement("strong", null, "FINANCING")), 
-                              React.createElement("li", null, "Credit Application")
+                              React.createElement("li", null, React.createElement(Link, {to: '/credit-application'}, "Credit Application"))
                             )
                           ), 
                           React.createElement("div", {className: "col-md-3 text-center"}, 
@@ -27184,7 +27279,7 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 
-},{"react":265,"react-router":107}],273:[function(require,module,exports){
+},{"react":265,"react-router":107}],274:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27227,7 +27322,7 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 
-},{"./layout.jsx":272,"react":265}],274:[function(require,module,exports){
+},{"./layout.jsx":273,"react":265}],275:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27255,7 +27350,7 @@ var IndexRoute = ReactRouter.IndexRoute;
 var Layout = require('../public/views/layout.jsx');
 var Index = require('../public/views/index.jsx');
 var CarDetail = require('../public/views/cardetail.jsx');
-var CarList = require('../public/views/carlist.jsx');
+var CreditAplication = require('../public/views/creditapp.jsx'); 
 
 
 // something like local:8000/new-cars/toyota/${car-vin}/red-2016-prius
@@ -27266,10 +27361,11 @@ var routes = module.exports = (
             React.createElement(IndexRoute, {component: Index}), 
             React.createElement(Route, {path: "inventory"}, 
               React.createElement(Route, {path: ":make/:vin/:model", component: CarDetail})
-            )
+            ), 
+            React.createElement(Route, {path: "credit-application", component: CreditAplication})
         )
     )
 );
 
 
-},{"../public/views/cardetail.jsx":269,"../public/views/carlist.jsx":270,"../public/views/index.jsx":271,"../public/views/layout.jsx":272,"react":265,"react-router":107}]},{},[268]);
+},{"../public/views/cardetail.jsx":269,"../public/views/creditapp.jsx":271,"../public/views/index.jsx":272,"../public/views/layout.jsx":273,"react":265,"react-router":107}]},{},[268]);

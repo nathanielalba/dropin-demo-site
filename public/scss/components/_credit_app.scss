@@ -1,0 +1,26 @@
+.credit-app {
+  height: 105rem;
+}
+
+.credit-app-header {
+  text-align: center;
+  margin-top: 5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #bdc3c7;
+}
+
+.custom-border {
+  border: 0;
+  box-shadow: none;
+  background-color: #ecf0f1;
+  border-radius: 0;
+  border-bottom: 1px solid black;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  &:focus {
+    border-color: #1abc9c;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    outline: none;
+  }
+}

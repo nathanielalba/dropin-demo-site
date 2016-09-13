@@ -24,7 +24,11 @@ var CarDetail = React.createClass({
         featured: car.featured,
         preowned: car.preowned,
         price: car.price,
-        miles: car.miles
+        miles: car.miles,
+        transmission: car.transmission,
+        engine: car.engine,
+        fuel: car.fuel,
+        title: car.title
       }
     }, function() {
       console.log(this.state)
@@ -41,7 +45,14 @@ var CarDetail = React.createClass({
             </div>
             <div className='col-md-4'>
               <h2>{this.state.car.year} - {this.state.car.make} {this.state.car.model}</h2>
+              <p>Mileage: {this.state.car.miles}</p>
+              <p>Transmission Type: {this.state.car.transmission}</p>
+              <p>Fuel Type: {this.state.car.fuel}</p>
+              <p>Engine: {this.state.car.engine}</p>
+              <p>Title: {this.state.car.title}</p>
+              <p>CARFAX: <a href='#'>Click for a CarFax Check!</a></p>
               <h6>VIN#{this.state.car.vin}</h6>
+              <h3>Internet Price: <strong>${this.state.car.price}</strong></h3>
             </div>
           </div>
           <div className='detail-contact-form'>

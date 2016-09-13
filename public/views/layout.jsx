@@ -26,7 +26,7 @@ module.exports = React.createClass({
             <html>
                 <head>
                     <meta charSet='utf-8' />
-                    <title>{this.props.title}</title>
+                    <title>ZAuto | West Hollywood</title>
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' />
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' />
                     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/assets/owl.carousel.min.css' />
@@ -79,14 +79,14 @@ module.exports = React.createClass({
                           <div className='col-md-3 text-center'>
                             <ul>
                               <li><strong>INVENTORY</strong></li>
-                              <li>New Vehicles</li>
-                              <li>Pre-Owned Vehicles</li>
+                              <li><a href='#'>New Vehicles</a></li>
+                              <li><a href='#'>Pre-Owned Vehicles</a></li>
                             </ul>
                           </div>
                           <div className='col-md-3 text-center'>
                             <ul>
                               <li><strong>FINANCING</strong></li>
-                              <li>Credit Application</li>
+                              <li><Link to={'/credit-application'}>Credit Application</Link></li>
                             </ul>
                           </div>
                           <div className='col-md-3 text-center'>
