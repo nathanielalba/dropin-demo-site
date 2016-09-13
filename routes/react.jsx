@@ -25,7 +25,7 @@ var IndexRoute = ReactRouter.IndexRoute;
 var Layout = require('../public/views/layout.jsx');
 var Index = require('../public/views/index.jsx');
 var CarDetail = require('../public/views/cardetail.jsx');
-var CreditAplication = require('../public/views/creditapp.jsx'); 
+var CreditAplication = require('../public/views/creditapp.jsx');
 
 
 // something like local:8000/new-cars/toyota/${car-vin}/red-2016-prius

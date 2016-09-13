@@ -26936,11 +26936,17 @@ module.exports = CarList;
 
 },{"react":265}],271:[function(require,module,exports){
 var React = require('react');
+var Router = require('react-router');
+
 
 var CreditApp = React.createClass({displayName: "CreditApp",
   onSubmit: function(e) {
     e.preventDefault();
-    alert('here is the form!!');
+
+    setTimeout(function() {
+      $('.credit-submit-form').modal('hide');
+      Router.browserHistory.push('/');
+    }, 7000);
   },
 
   render: function() {
@@ -27007,7 +27013,21 @@ var CreditApp = React.createClass({displayName: "CreditApp",
                 )
               )
             ), 
-            React.createElement("button", {type: "submit", className: "btn btn-default"}, "Submit")
+            React.createElement("button", {type: "submit", className: "btn btn-default", "data-toggle": "modal", "data-target": ".credit-submit-form"}, "Submit")
+          )
+        ), 
+        React.createElement("div", {className: "modal fade credit-submit-form", tabindex: "-1", role: "dialog", "aria-labelleby": "CreditSubmit"}, 
+          React.createElement("div", {className: "modal-dialog modal-lg", role: "document"}, 
+            React.createElement("div", {className: "modal-content"}, 
+              React.createElement("div", {className: "modal-header"}, 
+                React.createElement("button", {type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close"}, React.createElement("span", {"aria-hidden": "true"}, "×")), 
+                React.createElement("h3", {className: "modal-title"}, "ZAuto | West Hollywood")
+              ), 
+              React.createElement("div", {className: "modal-body"}, 
+                React.createElement("h4", null, "Thank you very much for your application.."), 
+                React.createElement("p", null, "We are reviewing your application now, and we will call you as soon as we have an answer for you!")
+              )
+            )
           )
         )
       )
@@ -27018,7 +27038,7 @@ var CreditApp = React.createClass({displayName: "CreditApp",
 module.exports = CreditApp;
 
 
-},{"react":265}],272:[function(require,module,exports){
+},{"react":265,"react-router":107}],272:[function(require,module,exports){
 var React = require('react');
 
 var FeaturedCar = require('../components/featuredcar.jsx');
@@ -27350,7 +27370,7 @@ var IndexRoute = ReactRouter.IndexRoute;
 var Layout = require('../public/views/layout.jsx');
 var Index = require('../public/views/index.jsx');
 var CarDetail = require('../public/views/cardetail.jsx');
-var CreditAplication = require('../public/views/creditapp.jsx'); 
+var CreditAplication = require('../public/views/creditapp.jsx');
 
 
 // something like local:8000/new-cars/toyota/${car-vin}/red-2016-prius

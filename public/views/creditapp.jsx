@@ -1,8 +1,15 @@
 var React = require('react');
+var Router = require('react-router');
+
 
 var CreditApp = React.createClass({
   onSubmit: function(e) {
     e.preventDefault();
+
+    setTimeout(function() {
+      $('.credit-submit-form').modal('hide');
+      Router.browserHistory.push('/');
+    }, 7000);
   },
 
   render: function() {
@@ -69,8 +76,22 @@ var CreditApp = React.createClass({
                 </div>
               </div>
             </div>
-            <button type='submit' className='btn btn-default'>Submit</button>
+            <button type='submit' className='btn btn-default' data-toggle='modal' data-target='.credit-submit-form'>Submit</button>
           </form>
+        </div>
+        <div className='modal fade credit-submit-form' tabindex='-1' role='dialog' aria-labelleby='CreditSubmit'>
+          <div className='modal-dialog modal-lg' role='document'>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+                <h3 className='modal-title'>ZAuto | West Hollywood</h3>
+              </div>
+              <div className='modal-body'>
+                <h4>Thank you very much for your application..</h4>
+                <p>We are reviewing your application now, and we will call you as soon as we have an answer for you!</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
