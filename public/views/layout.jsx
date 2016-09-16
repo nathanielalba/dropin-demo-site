@@ -29,7 +29,6 @@ module.exports = React.createClass({
                     <title>ZAuto | West Hollywood</title>
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' />
                     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' />
-                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/assets/owl.carousel.min.css' />
                     <link rel='stylesheet' href='http://lvh.me:8000/app.min.css' />
                 </head>
                 <body>
@@ -101,7 +100,6 @@ module.exports = React.createClass({
                   </div>
                   <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
                   <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
-                  <script src='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/owl.carousel.min.js'></script>
                   <script src='http://lvh.me:8000/bundle.js'></script>
                 </body>
             </html>

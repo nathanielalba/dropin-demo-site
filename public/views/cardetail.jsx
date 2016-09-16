@@ -1,4 +1,5 @@
 var React = require('react');
+import ImageGallery from 'react-image-gallery';
 
 var CarDetail = React.createClass({
 
@@ -34,14 +35,22 @@ var CarDetail = React.createClass({
       console.log(this.state)
     });
   },
-
   render: function() {
+    var images = [];
+    this.state.car.images.map(function(data, id) {
+      images.push({
+        original: data,
+        thumbnail: data
+      });
+    });
+
+
     return (
       <div className='container'>
         <div className='car-detail'>
           <div className='row'>
             <div className='col-md-8'>
-              <img src={this.state.car.images[0]} />
+              <ImageGallery items={images} slideInterval={2000}/>
             </div>
             <div className='col-md-4'>
               <h2>{this.state.car.year} - {this.state.car.make} {this.state.car.model}</h2>

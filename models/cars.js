@@ -4,7 +4,12 @@ module.exports = function CarsModel() {
     return {
         cars: [
           {
-            images: ['https://upload.wikimedia.org/wikipedia/commons/5/55/07-08_Toyota_Camry_XLE.jpg'],
+            images: [
+              'https://upload.wikimedia.org/wikipedia/commons/5/55/07-08_Toyota_Camry_XLE.jpg',
+              'http://media.caranddriver.com/images/media/267359/2007-toyota-camry-hybrid-photo-5070-s-450x274.jpg',
+              'http://blog.caranddriver.com/wp-content/uploads/2014/09/2015-Toyota-Camry-XSE-PLACEMENT-626x382.jpg',
+              'https://upload.wikimedia.org/wikipedia/commons/a/a2/Toyota_Camry_2.5Q,_XV50_rear_view.jpg'
+            ],
             vin: '5N1AN08W26C506723',
             make: 'Toyota',
             model: 'Camry',

@@ -10,7 +10,7 @@ module.exports = function browserify(grunt) {
             src: './public/main.js',
             dest: './public/bundle.js',
             options: {
-                transform: [ 'reactify', 'require-globify' ]
+                transform: [ [ 'babelify', { presets: [ 'es2015', 'react' ]}],'reactify', 'require-globify' ]
             }
             //,
 			//files: {

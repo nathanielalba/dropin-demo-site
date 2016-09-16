@@ -3821,12 +3821,12 @@ exports.stringify = function (obj) {
 	}).join('&') : '';
 };
 
-},{"strict-uri-encode":266}],75:[function(require,module,exports){
+},{"strict-uri-encode":268}],75:[function(require,module,exports){
 'use strict';
 
 module.exports = require('react/lib/ReactDOM');
 
-},{"react/lib/ReactDOM":171}],76:[function(require,module,exports){
+},{"react/lib/ReactDOM":173}],76:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
 |  Copyright (C) 2016 PayPal                                                                                          |
 |                                                                                                                     |
@@ -3950,7 +3950,7 @@ exports.boot = function boot(options, callback) {
   return callback && callback(props, history);
 };
 
-},{"./config.json":77,"history":36,"lodash/object/merge":71,"react":265,"react-dom":75,"react-router":107}],77:[function(require,module,exports){
+},{"./config.json":77,"history":36,"lodash/object/merge":71,"react":267,"react-dom":75,"react-router":108}],77:[function(require,module,exports){
 module.exports={
   "docType": "<!DOCTYPE html>",
   "defaultKeysToFilter": ["settings", "enrouten", "_locals"],
@@ -3961,6 +3961,943 @@ module.exports={
 }
 
 },{}],78:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactSwipeable = require('react-swipeable');
+
+var _reactSwipeable2 = _interopRequireDefault(_reactSwipeable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MIN_INTERVAL = 500;
+
+function throttle(func, wait) {
+  var context = void 0,
+      args = void 0,
+      result = void 0;
+  var timeout = null;
+  var previous = 0;
+
+  var later = function later() {
+    previous = new Date().getTime();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+
+  return function () {
+    var now = new Date().getTime();
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+}
+
+// This is to handle accessing event properties in an asynchronous way
+// https://facebook.github.io/react/docs/events.html#syntheticevent
+function debounceEventHandler() {
+  var throttled = throttle.apply(undefined, arguments);
+  return function (event) {
+    if (event) {
+      event.persist();
+      return throttled(event);
+    }
+
+    return throttled();
+  };
+}
+
+var screenChangeEvents = ['fullscreenchange', 'msfullscreenchange', 'mozfullscreenchange', 'webkitfullscreenchange'];
+
+var ImageGallery = function (_React$Component) {
+  _inherits(ImageGallery, _React$Component);
+
+  function ImageGallery(props) {
+    _classCallCheck(this, ImageGallery);
+
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ImageGallery).call(this, props));
+
+    _this.state = {
+      currentIndex: props.startIndex,
+      thumbsTranslateX: 0,
+      offsetPercentage: 0,
+      galleryWidth: 0,
+      thumbnailWidth: 0,
+      isFullscreen: false,
+      isPlaying: false
+    };
+    return _this;
+  }
+
+  _createClass(ImageGallery, [{
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (this.props.disableArrowKeys !== nextProps.disableArrowKeys) {
+        if (nextProps.disableArrowKeys) {
+          window.removeEventListener('keydown', this._handleKeyDown);
+        } else {
+          window.addEventListener('keydown', this._handleKeyDown);
+        }
+      }
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      if (prevState.thumbnailWidth !== this.state.thumbnailWidth || prevProps.showThumbnails !== this.props.showThumbnails) {
+
+        // adjust thumbnail container when thumbnail width is adjusted
+        this._setThumbsTranslateX(-this._getThumbsTranslateX(this.state.currentIndex > 0 ? 1 : 0) * this.state.currentIndex);
+      }
+
+      if (prevState.currentIndex !== this.state.currentIndex) {
+        if (this.props.onSlide) {
+          this.props.onSlide(this.state.currentIndex);
+        }
+
+        this._updateThumbnailTranslateX(prevState);
+      }
+    }
+  }, {
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+
+      this._slideLeft = debounceEventHandler(this._slideLeft.bind(this), MIN_INTERVAL, true);
+
+      this._slideRight = debounceEventHandler(this._slideRight.bind(this), MIN_INTERVAL, true);
+
+      this._handleResize = this._handleResize.bind(this);
+      this._handleScreenChange = this._handleScreenChange.bind(this);
+      this._handleKeyDown = this._handleKeyDown.bind(this);
+      this._thumbnailDelay = 300;
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      // delay initial resize to get the accurate this._imageGallery.offsetWidth
+      window.setTimeout(function () {
+        return _this2._handleResize();
+      }, 500);
+
+      if (this.props.autoPlay) {
+        this.play();
+      }
+      if (!this.props.disableArrowKeys) {
+        window.addEventListener('keydown', this._handleKeyDown);
+      }
+      window.addEventListener('resize', this._handleResize);
+      this._onScreenChangeEvent();
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      if (!this.props.disableArrowKeys) {
+        window.removeEventListener('keydown', this._handleKeyDown);
+      }
+      window.removeEventListener('resize', this._handleResize);
+      this._offScreenChangeEvent();
+
+      if (this._intervalId) {
+        window.clearInterval(this._intervalId);
+        this._intervalId = null;
+      }
+    }
+  }, {
+    key: 'play',
+    value: function play() {
+      var _this3 = this;
+
+      var callback = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+      if (!this._intervalId) {
+        this.setState({ isPlaying: true });
+        var slideInterval = this.props.slideInterval;
+
+        this._intervalId = window.setInterval(function () {
+          if (!_this3.state.hovering) {
+            if (!_this3.props.infinite && !_this3._canSlideRight()) {
+              _this3.pause();
+            } else {
+              _this3.slideToIndex(_this3.state.currentIndex + 1);
+            }
+          }
+        }, slideInterval > MIN_INTERVAL ? slideInterval : MIN_INTERVAL);
+
+        if (this.props.onPlay && callback) {
+          this.props.onPlay(this.state.currentIndex);
+        }
+      }
+    }
+  }, {
+    key: 'pause',
+    value: function pause() {
+      var callback = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+      if (this._intervalId) {
+        window.clearInterval(this._intervalId);
+        this._intervalId = null;
+        this.setState({ isPlaying: false });
+
+        if (this.props.onPause && callback) {
+          this.props.onPause(this.state.currentIndex);
+        }
+      }
+    }
+  }, {
+    key: 'fullScreen',
+    value: function fullScreen() {
+      var gallery = this._imageGallery;
+
+      if (gallery.requestFullscreen) {
+        gallery.requestFullscreen();
+      } else if (gallery.msRequestFullscreen) {
+        gallery.msRequestFullscreen();
+      } else if (gallery.mozRequestFullScreen) {
+        gallery.mozRequestFullScreen();
+      } else if (gallery.webkitRequestFullscreen) {
+        gallery.webkitRequestFullscreen();
+      } else {
+        // fallback to modal for unsupported browsers
+        this.setState({ modalFullscreen: true });
+      }
+
+      this.setState({ isFullscreen: true });
+    }
+  }, {
+    key: 'exitFullScreen',
+    value: function exitFullScreen() {
+      if (this.state.isFullscreen) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        } else {
+          // fallback to modal for unsupported browsers
+          this.setState({ modalFullscreen: false });
+        }
+
+        this.setState({ isFullscreen: false });
+      }
+    }
+  }, {
+    key: 'slideToIndex',
+    value: function slideToIndex(index, event) {
+      if (event) {
+        event.preventDefault();
+        if (this._intervalId) {
+          // user triggered event while ImageGallery is playing, reset interval
+          this.pause(false);
+          this.play(false);
+        }
+      }
+
+      var slideCount = this.props.items.length - 1;
+      var currentIndex = index;
+
+      if (index < 0) {
+        currentIndex = slideCount;
+      } else if (index > slideCount) {
+        currentIndex = 0;
+      }
+
+      this.setState({
+        previousIndex: this.state.currentIndex,
+        currentIndex: currentIndex,
+        offsetPercentage: 0,
+        style: {
+          transition: 'transform .45s ease-out'
+        }
+      });
+    }
+  }, {
+    key: 'getCurrentIndex',
+    value: function getCurrentIndex() {
+      return this.state.currentIndex;
+    }
+  }, {
+    key: '_onScreenChangeEvent',
+    value: function _onScreenChangeEvent() {
+      var _this4 = this;
+
+      screenChangeEvents.map(function (eventName) {
+        document.addEventListener(eventName, _this4._handleScreenChange);
+      });
+    }
+  }, {
+    key: '_offScreenChangeEvent',
+    value: function _offScreenChangeEvent() {
+      var _this5 = this;
+
+      screenChangeEvents.map(function (eventName) {
+        document.removeEventListener(eventName, _this5._handleScreenChange);
+      });
+    }
+  }, {
+    key: '_togglePlay',
+    value: function _togglePlay() {
+      if (this._intervalId) {
+        this.pause();
+      } else {
+        this.play();
+      }
+    }
+  }, {
+    key: '_toggleFullScreen',
+    value: function _toggleFullScreen() {
+      if (this.state.isFullscreen) {
+        this.exitFullScreen();
+      } else {
+        this.fullScreen();
+      }
+    }
+  }, {
+    key: '_handleResize',
+    value: function _handleResize() {
+      if (this._imageGallery) {
+        this.setState({ galleryWidth: this._imageGallery.offsetWidth });
+      }
+
+      if (this._imageGalleryThumbnail) {
+        this.setState({ thumbnailWidth: this._imageGalleryThumbnail.offsetWidth });
+      }
+    }
+  }, {
+    key: '_handleScreenChange',
+    value: function _handleScreenChange() {
+      var fullScreenElement = document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+
+      if (this.props.onScreenChange) {
+        this.props.onScreenChange(fullScreenElement);
+      }
+
+      this.setState({ isFullscreen: !!fullScreenElement });
+    }
+  }, {
+    key: '_handleKeyDown',
+    value: function _handleKeyDown(event) {
+      var LEFT_ARROW = 37;
+      var RIGHT_ARROW = 39;
+      var key = parseInt(event.keyCode || event.which || 0);
+
+      switch (key) {
+        case LEFT_ARROW:
+          if (this._canSlideLeft() && !this._intervalId) {
+            this._slideLeft();
+          }
+          break;
+        case RIGHT_ARROW:
+          if (this._canSlideRight() && !this._intervalId) {
+            this._slideRight();
+          }
+          break;
+      }
+    }
+  }, {
+    key: '_handleMouseOverThumbnails',
+    value: function _handleMouseOverThumbnails(index) {
+      var _this6 = this;
+
+      if (this.props.slideOnThumbnailHover) {
+        this.setState({ hovering: true });
+        if (this._thumbnailTimer) {
+          window.clearTimeout(this._thumbnailTimer);
+          this._thumbnailTimer = null;
+        }
+        this._thumbnailTimer = window.setTimeout(function () {
+          _this6.slideToIndex(index);
+        }, this._thumbnailDelay);
+      }
+    }
+  }, {
+    key: '_handleMouseLeaveThumbnails',
+    value: function _handleMouseLeaveThumbnails() {
+      if (this._thumbnailTimer) {
+        window.clearTimeout(this._thumbnailTimer);
+        this._thumbnailTimer = null;
+        if (this.props.autoPlay === true) {
+          this.play(false);
+        }
+      }
+      this.setState({ hovering: false });
+    }
+  }, {
+    key: '_handleImageError',
+    value: function _handleImageError(event) {
+      if (this.props.defaultImage && event.target.src.indexOf(this.props.defaultImage) === -1) {
+        event.target.src = this.props.defaultImage;
+      }
+    }
+  }, {
+    key: '_handleOnSwiped',
+    value: function _handleOnSwiped(ev, x, y, isFlick) {
+      this.setState({ isFlick: isFlick });
+    }
+  }, {
+    key: '_shouldSlideOnSwipe',
+    value: function _shouldSlideOnSwipe() {
+      var shouldSlide = Math.abs(this.state.offsetPercentage) > 30 || this.state.isFlick;
+
+      if (shouldSlide) {
+        // reset isFlick state after so data is not persisted
+        this.setState({ isFlick: false });
+      }
+      return shouldSlide;
+    }
+  }, {
+    key: '_handleOnSwipedTo',
+    value: function _handleOnSwipedTo(index) {
+      var slideTo = this.state.currentIndex;
+
+      if (this._shouldSlideOnSwipe()) {
+        slideTo += index;
+      }
+
+      if (index < 0) {
+        if (!this._canSlideLeft()) {
+          slideTo = this.state.currentIndex;
+        }
+      } else {
+        if (!this._canSlideRight()) {
+          slideTo = this.state.currentIndex;
+        }
+      }
+
+      this.slideToIndex(slideTo);
+    }
+  }, {
+    key: '_handleSwiping',
+    value: function _handleSwiping(index, _, delta) {
+      var offsetPercentage = index * (delta / this.state.galleryWidth * 100);
+      this.setState({ offsetPercentage: offsetPercentage, style: {} });
+    }
+  }, {
+    key: '_canNavigate',
+    value: function _canNavigate() {
+      return this.props.items.length >= 2;
+    }
+  }, {
+    key: '_canSlideLeft',
+    value: function _canSlideLeft() {
+      return this.props.infinite || this.state.currentIndex > 0;
+    }
+  }, {
+    key: '_canSlideRight',
+    value: function _canSlideRight() {
+      return this.props.infinite || this.state.currentIndex < this.props.items.length - 1;
+    }
+  }, {
+    key: '_updateThumbnailTranslateX',
+    value: function _updateThumbnailTranslateX(prevState) {
+      if (this.state.currentIndex === 0) {
+        this._setThumbsTranslateX(0);
+      } else {
+        var indexDifference = Math.abs(prevState.currentIndex - this.state.currentIndex);
+        var scrollX = this._getThumbsTranslateX(indexDifference);
+        if (scrollX > 0) {
+          if (prevState.currentIndex < this.state.currentIndex) {
+            this._setThumbsTranslateX(this.state.thumbsTranslateX - scrollX);
+          } else if (prevState.currentIndex > this.state.currentIndex) {
+            this._setThumbsTranslateX(this.state.thumbsTranslateX + scrollX);
+          }
+        }
+      }
+    }
+  }, {
+    key: '_setThumbsTranslateX',
+    value: function _setThumbsTranslateX(thumbsTranslateX) {
+      this.setState({ thumbsTranslateX: thumbsTranslateX });
+    }
+  }, {
+    key: '_getThumbsTranslateX',
+    value: function _getThumbsTranslateX(indexDifference) {
+      if (this.props.disableThumbnailScroll) {
+        return 0;
+      }
+
+      var thumbnailWidth = this.state.thumbnailWidth;
+
+
+      if (this._thumbnails) {
+        if (this._thumbnails.scrollWidth <= thumbnailWidth) {
+          return 0;
+        }
+        var totalThumbnails = this._thumbnails.children.length;
+        // total scroll-x required to see the last thumbnail
+        var totalScrollX = this._thumbnails.scrollWidth - thumbnailWidth;
+        // scroll-x required per index change
+        var perIndexScrollX = totalScrollX / (totalThumbnails - 1);
+
+        return indexDifference * perIndexScrollX;
+      }
+    }
+  }, {
+    key: '_getAlignmentClassName',
+    value: function _getAlignmentClassName(index) {
+      // LEFT, and RIGHT alignments are necessary for lazyLoad
+      var currentIndex = this.state.currentIndex;
+
+      var alignment = '';
+      var LEFT = 'left';
+      var CENTER = 'center';
+      var RIGHT = 'right';
+
+      switch (index) {
+        case currentIndex - 1:
+          alignment = ' ' + LEFT;
+          break;
+        case currentIndex:
+          alignment = ' ' + CENTER;
+          break;
+        case currentIndex + 1:
+          alignment = ' ' + RIGHT;
+          break;
+      }
+
+      if (this.props.items.length >= 3 && this.props.infinite) {
+        if (index === 0 && currentIndex === this.props.items.length - 1) {
+          // set first slide as right slide if were sliding right from last slide
+          alignment = ' ' + RIGHT;
+        } else if (index === this.props.items.length - 1 && currentIndex === 0) {
+          // set last slide as left slide if were sliding left from first slide
+          alignment = ' ' + LEFT;
+        }
+      }
+
+      return alignment;
+    }
+  }, {
+    key: '_getTranslateXForTwoSlide',
+    value: function _getTranslateXForTwoSlide(index) {
+      // For taking care of infinite swipe when there are only two slides
+      var _state = this.state;
+      var currentIndex = _state.currentIndex;
+      var offsetPercentage = _state.offsetPercentage;
+      var previousIndex = _state.previousIndex;
+
+      var baseTranslateX = -100 * currentIndex;
+      var translateX = baseTranslateX + index * 100 + offsetPercentage;
+
+      // keep track of user swiping direction
+      if (offsetPercentage > 0) {
+        this.direction = 'left';
+      } else if (offsetPercentage < 0) {
+        this.direction = 'right';
+      }
+
+      // when swiping make sure the slides are on the correct side
+      if (currentIndex === 0 && index === 1 && offsetPercentage > 0) {
+        translateX = -100 + offsetPercentage;
+      } else if (currentIndex === 1 && index === 0 && offsetPercentage < 0) {
+        translateX = 100 + offsetPercentage;
+      }
+
+      if (currentIndex !== previousIndex) {
+        // when swiped move the slide to the correct side
+        if (previousIndex === 0 && index === 0 && offsetPercentage === 0 && this.direction === 'left') {
+          translateX = 100;
+        } else if (previousIndex === 1 && index === 1 && offsetPercentage === 0 && this.direction === 'right') {
+          translateX = -100;
+        }
+      } else {
+        // keep the slide on the correct slide even when not a swipe
+        if (currentIndex === 0 && index === 1 && offsetPercentage === 0 && this.direction === 'left') {
+          translateX = -100;
+        } else if (currentIndex === 1 && index === 0 && offsetPercentage === 0 && this.direction === 'right') {
+          translateX = 100;
+        }
+      }
+
+      return translateX;
+    }
+  }, {
+    key: '_getSlideStyle',
+    value: function _getSlideStyle(index) {
+      var _state2 = this.state;
+      var currentIndex = _state2.currentIndex;
+      var offsetPercentage = _state2.offsetPercentage;
+      var _props = this.props;
+      var infinite = _props.infinite;
+      var items = _props.items;
+
+      var baseTranslateX = -100 * currentIndex;
+      var totalSlides = items.length - 1;
+
+      // calculates where the other slides belong based on currentIndex
+      var translateX = baseTranslateX + index * 100 + offsetPercentage;
+
+      // adjust zIndex so that only the current slide and the slide were going
+      // to is at the top layer, this prevents transitions from flying in the
+      // background when swiping before the first slide or beyond the last slide
+      var zIndex = 1;
+      if (index === currentIndex) {
+        zIndex = 3;
+      } else if (index === this.state.previousIndex) {
+        zIndex = 2;
+      }
+
+      if (infinite && items.length > 2) {
+        if (currentIndex === 0 && index === totalSlides) {
+          // make the last slide the slide before the first
+          translateX = -100 + offsetPercentage;
+        } else if (currentIndex === totalSlides && index === 0) {
+          // make the first slide the slide after the last
+          translateX = 100 + offsetPercentage;
+        }
+      }
+
+      // Special case when there are only 2 items with infinite on
+      if (infinite && items.length === 2) {
+        translateX = this._getTranslateXForTwoSlide(index);
+      }
+
+      var translate3d = 'translate3d(' + translateX + '%, 0, 0)';
+
+      return {
+        WebkitTransform: translate3d,
+        MozTransform: translate3d,
+        msTransform: translate3d,
+        OTransform: translate3d,
+        transform: translate3d,
+        zIndex: zIndex
+      };
+    }
+  }, {
+    key: '_getThumbnailStyle',
+    value: function _getThumbnailStyle() {
+      var translate3d = 'translate3d(' + this.state.thumbsTranslateX + 'px, 0, 0)';
+      return {
+        WebkitTransform: translate3d,
+        MozTransform: translate3d,
+        msTransform: translate3d,
+        OTransform: translate3d,
+        transform: translate3d
+      };
+    }
+  }, {
+    key: '_slideLeft',
+    value: function _slideLeft(event) {
+      this.slideToIndex(this.state.currentIndex - 1, event);
+    }
+  }, {
+    key: '_slideRight',
+    value: function _slideRight(event) {
+      this.slideToIndex(this.state.currentIndex + 1, event);
+    }
+  }, {
+    key: '_renderItem',
+    value: function _renderItem(item) {
+      var onImageError = this.props.onImageError || this._handleImageError;
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'image-gallery-image' },
+        _react2.default.createElement('img', {
+          src: item.original,
+          alt: item.originalAlt,
+          srcSet: item.srcSet,
+          sizes: item.sizes,
+          onLoad: this.props.onImageLoad,
+          onError: onImageError.bind(this)
+        }),
+        item.description && _react2.default.createElement(
+          'span',
+          { className: 'image-gallery-description' },
+          item.description
+        )
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this7 = this;
+
+      var _state3 = this.state;
+      var currentIndex = _state3.currentIndex;
+      var isFullscreen = _state3.isFullscreen;
+      var modalFullscreen = _state3.modalFullscreen;
+      var isPlaying = _state3.isPlaying;
+
+
+      var thumbnailStyle = this._getThumbnailStyle();
+
+      var slideLeft = this._slideLeft.bind(this);
+      var slideRight = this._slideRight.bind(this);
+
+      var slides = [];
+      var thumbnails = [];
+      var bullets = [];
+
+      this.props.items.map(function (item, index) {
+        var alignment = _this7._getAlignmentClassName(index);
+        var originalClass = item.originalClass ? ' ' + item.originalClass : '';
+        var thumbnailClass = item.thumbnailClass ? ' ' + item.thumbnailClass : '';
+
+        var renderItem = item.renderItem || _this7.props.renderItem || _this7._renderItem.bind(_this7);
+
+        var slide = _react2.default.createElement(
+          'div',
+          {
+            key: index,
+            className: 'image-gallery-slide' + alignment + originalClass,
+            style: _extends(_this7._getSlideStyle(index), _this7.state.style),
+            onClick: _this7.props.onClick
+          },
+          renderItem(item)
+        );
+
+        if (_this7.props.lazyLoad) {
+          if (alignment) {
+            slides.push(slide);
+          }
+        } else {
+          slides.push(slide);
+        }
+
+        var onThumbnailError = _this7._handleImageError;
+        if (_this7.props.onThumbnailError) {
+          onThumbnailError = _this7.props.onThumbnailError;
+        }
+
+        if (_this7.props.showThumbnails) {
+          thumbnails.push(_react2.default.createElement(
+            'a',
+            {
+              onMouseOver: _this7._handleMouseOverThumbnails.bind(_this7, index),
+              onMouseLeave: _this7._handleMouseLeaveThumbnails.bind(_this7, index),
+              key: index,
+              className: 'image-gallery-thumbnail' + (currentIndex === index ? ' active' : '') + thumbnailClass,
+
+              onTouchStart: function onTouchStart(event) {
+                return _this7.slideToIndex.call(_this7, index, event);
+              },
+              onClick: function onClick(event) {
+                return _this7.slideToIndex.call(_this7, index, event);
+              } },
+            _react2.default.createElement('img', {
+              src: item.thumbnail,
+              alt: item.thumbnailAlt,
+              onError: onThumbnailError.bind(_this7) }),
+            _react2.default.createElement(
+              'div',
+              { className: 'image-gallery-thumbnail-label' },
+              item.thumbnailLabel
+            )
+          ));
+        }
+
+        if (_this7.props.showBullets) {
+          bullets.push(_react2.default.createElement('li', {
+            key: index,
+            className: 'image-gallery-bullet ' + (currentIndex === index ? 'active' : ''),
+
+            onTouchStart: function onTouchStart(event) {
+              return _this7.slideToIndex.call(_this7, index, event);
+            },
+            onClick: function onClick(event) {
+              return _this7.slideToIndex.call(_this7, index, event);
+            } }));
+        }
+      });
+
+      return _react2.default.createElement(
+        'section',
+        {
+          ref: function ref(i) {
+            return _this7._imageGallery = i;
+          },
+          className: 'image-gallery' + (modalFullscreen ? ' fullscreen-modal' : '') },
+        _react2.default.createElement(
+          'div',
+          { className: 'image-gallery-content' + (isFullscreen ? ' fullscreen' : '') },
+          _react2.default.createElement(
+            'div',
+            {
+              className: 'image-gallery-slide-wrapper' },
+            this.props.showFullscreenButton && _react2.default.createElement('a', {
+              className: 'image-gallery-fullscreen-button' + (isFullscreen ? ' active' : ''),
+              onClick: this._toggleFullScreen.bind(this) }),
+            this.props.showPlayButton && _react2.default.createElement('a', {
+              ref: function ref(p) {
+                return _this7._playButton = p;
+              },
+              className: 'image-gallery-play-button' + (isPlaying ? ' active' : ''),
+              onClick: this._togglePlay.bind(this) }),
+            this._canNavigate() ? [this.props.showNav && _react2.default.createElement(
+              'span',
+              { key: 'navigation' },
+              _react2.default.createElement('a', {
+                className: 'image-gallery-left-nav',
+                disabled: !this._canSlideLeft(),
+                onTouchStart: slideLeft,
+                onClick: slideLeft }),
+              _react2.default.createElement('a', {
+                className: 'image-gallery-right-nav',
+                disabled: !this._canSlideRight(),
+                onTouchStart: slideRight,
+                onClick: slideRight })
+            ), _react2.default.createElement(
+              _reactSwipeable2.default,
+              {
+                className: 'image-gallery-swipe',
+                key: 'swipeable',
+                delta: 1,
+                onSwipingLeft: this._handleSwiping.bind(this, -1),
+                onSwipingRight: this._handleSwiping.bind(this, 1),
+                onSwiped: this._handleOnSwiped.bind(this),
+                onSwipedLeft: this._handleOnSwipedTo.bind(this, 1),
+                onSwipedRight: this._handleOnSwipedTo.bind(this, -1)
+              },
+              _react2.default.createElement(
+                'div',
+                { className: 'image-gallery-slides' },
+                slides
+              )
+            )] : _react2.default.createElement(
+              'div',
+              { className: 'image-gallery-slides' },
+              slides
+            ),
+            this.props.showBullets && _react2.default.createElement(
+              'div',
+              { className: 'image-gallery-bullets' },
+              _react2.default.createElement(
+                'ul',
+                { className: 'image-gallery-bullets-container' },
+                bullets
+              )
+            ),
+            this.props.showIndex && _react2.default.createElement(
+              'div',
+              { className: 'image-gallery-index' },
+              _react2.default.createElement(
+                'span',
+                { className: 'image-gallery-index-current' },
+                this.state.currentIndex + 1
+              ),
+              _react2.default.createElement(
+                'span',
+                { className: 'image-gallery-index-separator' },
+                this.props.indexSeparator
+              ),
+              _react2.default.createElement(
+                'span',
+                { className: 'image-gallery-index-total' },
+                this.props.items.length
+              )
+            )
+          ),
+          this.props.showThumbnails && _react2.default.createElement(
+            'div',
+            {
+              className: 'image-gallery-thumbnails',
+              ref: function ref(i) {
+                return _this7._imageGalleryThumbnail = i;
+              }
+            },
+            _react2.default.createElement(
+              'div',
+              {
+                ref: function ref(t) {
+                  return _this7._thumbnails = t;
+                },
+                className: 'image-gallery-thumbnails-container',
+                style: thumbnailStyle },
+              thumbnails
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return ImageGallery;
+}(_react2.default.Component);
+
+exports.default = ImageGallery;
+
+
+ImageGallery.propTypes = {
+  items: _react2.default.PropTypes.array.isRequired,
+  showNav: _react2.default.PropTypes.bool,
+  autoPlay: _react2.default.PropTypes.bool,
+  lazyLoad: _react2.default.PropTypes.bool,
+  infinite: _react2.default.PropTypes.bool,
+  showIndex: _react2.default.PropTypes.bool,
+  showBullets: _react2.default.PropTypes.bool,
+  showThumbnails: _react2.default.PropTypes.bool,
+  showPlayButton: _react2.default.PropTypes.bool,
+  showFullscreenButton: _react2.default.PropTypes.bool,
+  slideOnThumbnailHover: _react2.default.PropTypes.bool,
+  disableThumbnailScroll: _react2.default.PropTypes.bool,
+  disableArrowKeys: _react2.default.PropTypes.bool,
+  defaultImage: _react2.default.PropTypes.string,
+  indexSeparator: _react2.default.PropTypes.string,
+  startIndex: _react2.default.PropTypes.number,
+  slideInterval: _react2.default.PropTypes.number,
+  onSlide: _react2.default.PropTypes.func,
+  onPause: _react2.default.PropTypes.func,
+  onPlay: _react2.default.PropTypes.func,
+  onClick: _react2.default.PropTypes.func,
+  onImageLoad: _react2.default.PropTypes.func,
+  onImageError: _react2.default.PropTypes.func,
+  onThumbnailError: _react2.default.PropTypes.func,
+  renderItem: _react2.default.PropTypes.func
+};
+
+ImageGallery.defaultProps = {
+  items: [],
+  showNav: true,
+  autoPlay: false,
+  lazyLoad: false,
+  infinite: true,
+  showIndex: false,
+  showBullets: false,
+  showThumbnails: true,
+  showPlayButton: true,
+  showFullscreenButton: true,
+  slideOnThumbnailHover: false,
+  disableThumbnailScroll: false,
+  disableArrowKeys: false,
+  indexSeparator: ' / ',
+  startIndex: 0,
+  slideInterval: 3000
+};
+},{"react":267,"react-swipeable":138}],79:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -4049,7 +4986,7 @@ function mapAsync(array, work, callback) {
     });
   });
 }
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4081,7 +5018,7 @@ var History = {
 exports.default = History;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./InternalPropTypes":83,"./routerWarning":112,"g5I+bs":73}],80:[function(require,module,exports){
+},{"./InternalPropTypes":84,"./routerWarning":113,"g5I+bs":73}],81:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -4110,7 +5047,7 @@ var IndexLink = _react2.default.createClass({
 
 exports.default = IndexLink;
 module.exports = exports['default'];
-},{"./Link":85,"react":265}],81:[function(require,module,exports){
+},{"./Link":86,"react":267}],82:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4176,7 +5113,7 @@ var IndexRedirect = _react2.default.createClass({
 exports.default = IndexRedirect;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./InternalPropTypes":83,"./Redirect":88,"./routerWarning":112,"g5I+bs":73,"invariant":39,"react":265}],82:[function(require,module,exports){
+},{"./InternalPropTypes":84,"./Redirect":89,"./routerWarning":113,"g5I+bs":73,"invariant":39,"react":267}],83:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4239,7 +5176,7 @@ var IndexRoute = _react2.default.createClass({
 exports.default = IndexRoute;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./InternalPropTypes":83,"./RouteUtils":91,"./routerWarning":112,"g5I+bs":73,"invariant":39,"react":265}],83:[function(require,module,exports){
+},{"./InternalPropTypes":84,"./RouteUtils":92,"./routerWarning":113,"g5I+bs":73,"invariant":39,"react":267}],84:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -4272,7 +5209,7 @@ var component = exports.component = oneOfType([func, string]);
 var components = exports.components = oneOfType([component, object]);
 var route = exports.route = oneOfType([object, element]);
 var routes = exports.routes = oneOfType([route, arrayOf(route)]);
-},{"react":265}],84:[function(require,module,exports){
+},{"react":267}],85:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4343,7 +5280,7 @@ var Lifecycle = {
 exports.default = Lifecycle;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./routerWarning":112,"g5I+bs":73,"invariant":39,"react":265}],85:[function(require,module,exports){
+},{"./routerWarning":113,"g5I+bs":73,"invariant":39,"react":267}],86:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4522,7 +5459,7 @@ var Link = _react2.default.createClass({
 exports.default = Link;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./PropTypes":87,"./routerWarning":112,"g5I+bs":73,"invariant":39,"react":265}],86:[function(require,module,exports){
+},{"./PropTypes":88,"./routerWarning":113,"g5I+bs":73,"invariant":39,"react":267}],87:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4737,7 +5674,7 @@ function formatPattern(pattern, params) {
   return pathname.replace(/\/+/g, '/');
 }
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73,"invariant":39}],87:[function(require,module,exports){
+},{"g5I+bs":73,"invariant":39}],88:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4841,7 +5778,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 exports.default = defaultExport;
 }).call(this,require("g5I+bs"))
-},{"./InternalPropTypes":83,"./deprecateObjectProperties":103,"./routerWarning":112,"g5I+bs":73,"react":265}],88:[function(require,module,exports){
+},{"./InternalPropTypes":84,"./deprecateObjectProperties":104,"./routerWarning":113,"g5I+bs":73,"react":267}],89:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4946,7 +5883,7 @@ var Redirect = _react2.default.createClass({
 exports.default = Redirect;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./InternalPropTypes":83,"./PatternUtils":86,"./RouteUtils":91,"g5I+bs":73,"invariant":39,"react":265}],89:[function(require,module,exports){
+},{"./InternalPropTypes":84,"./PatternUtils":87,"./RouteUtils":92,"g5I+bs":73,"invariant":39,"react":267}],90:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5006,7 +5943,7 @@ var Route = _react2.default.createClass({
 exports.default = Route;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./InternalPropTypes":83,"./RouteUtils":91,"g5I+bs":73,"invariant":39,"react":265}],90:[function(require,module,exports){
+},{"./InternalPropTypes":84,"./RouteUtils":92,"g5I+bs":73,"invariant":39,"react":267}],91:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5054,7 +5991,7 @@ var RouteContext = {
 exports.default = RouteContext;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./routerWarning":112,"g5I+bs":73,"react":265}],91:[function(require,module,exports){
+},{"./routerWarning":113,"g5I+bs":73,"react":267}],92:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -5148,7 +6085,7 @@ function createRoutes(routes) {
 
   return routes;
 }
-},{"react":265}],92:[function(require,module,exports){
+},{"react":267}],93:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5375,7 +6312,7 @@ var Router = _react2.default.createClass({
 exports.default = Router;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./InternalPropTypes":83,"./RouteUtils":91,"./RouterContext":93,"./RouterUtils":94,"./createTransitionManager":102,"./routerWarning":112,"g5I+bs":73,"history/lib/createHashHistory":127,"history/lib/useQueries":134,"invariant":39,"react":265}],93:[function(require,module,exports){
+},{"./InternalPropTypes":84,"./RouteUtils":92,"./RouterContext":94,"./RouterUtils":95,"./createTransitionManager":103,"./routerWarning":113,"g5I+bs":73,"history/lib/createHashHistory":128,"history/lib/useQueries":135,"invariant":39,"react":267}],94:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5534,7 +6471,7 @@ var RouterContext = _react2.default.createClass({
 exports.default = RouterContext;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./RouteUtils":91,"./deprecateObjectProperties":103,"./getRouteParams":105,"./routerWarning":112,"g5I+bs":73,"invariant":39,"react":265}],94:[function(require,module,exports){
+},{"./RouteUtils":92,"./deprecateObjectProperties":104,"./getRouteParams":106,"./routerWarning":113,"g5I+bs":73,"invariant":39,"react":267}],95:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5569,7 +6506,7 @@ function createRoutingHistory(history, transitionManager) {
   return history;
 }
 }).call(this,require("g5I+bs"))
-},{"./deprecateObjectProperties":103,"g5I+bs":73}],95:[function(require,module,exports){
+},{"./deprecateObjectProperties":104,"g5I+bs":73}],96:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5602,7 +6539,7 @@ var RoutingContext = _react2.default.createClass({
 exports.default = RoutingContext;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./RouterContext":93,"./routerWarning":112,"g5I+bs":73,"react":265}],96:[function(require,module,exports){
+},{"./RouterContext":94,"./routerWarning":113,"g5I+bs":73,"react":267}],97:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5727,7 +6664,7 @@ function runLeaveHooks(routes, prevState) {
   }
 }
 }).call(this,require("g5I+bs"))
-},{"./AsyncUtils":78,"./routerWarning":112,"g5I+bs":73}],97:[function(require,module,exports){
+},{"./AsyncUtils":79,"./routerWarning":113,"g5I+bs":73}],98:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5787,7 +6724,7 @@ exports.default = function () {
 
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./RouterContext":93,"./routerWarning":112,"g5I+bs":73,"react":265}],98:[function(require,module,exports){
+},{"./RouterContext":94,"./routerWarning":113,"g5I+bs":73,"react":267}],99:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -5804,7 +6741,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = (0, _createRouterHistory2.default)(_createBrowserHistory2.default);
 module.exports = exports['default'];
-},{"./createRouterHistory":101,"history/lib/createBrowserHistory":125}],99:[function(require,module,exports){
+},{"./createRouterHistory":102,"history/lib/createBrowserHistory":126}],100:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -5882,7 +6819,7 @@ function computeChangedRoutes(prevState, nextState) {
 
 exports.default = computeChangedRoutes;
 module.exports = exports['default'];
-},{"./PatternUtils":86}],100:[function(require,module,exports){
+},{"./PatternUtils":87}],101:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -5915,7 +6852,7 @@ function createMemoryHistory(options) {
   return history;
 }
 module.exports = exports['default'];
-},{"history/lib/createMemoryHistory":130,"history/lib/useBasename":133,"history/lib/useQueries":134}],101:[function(require,module,exports){
+},{"history/lib/createMemoryHistory":131,"history/lib/useBasename":134,"history/lib/useQueries":135}],102:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -5935,7 +6872,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 
 module.exports = exports['default'];
-},{"./useRouterHistory":113}],102:[function(require,module,exports){
+},{"./useRouterHistory":114}],103:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -6246,7 +7183,7 @@ function createTransitionManager(history, routes) {
 
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./TransitionUtils":96,"./computeChangedRoutes":99,"./getComponents":104,"./isActive":108,"./matchRoutes":111,"./routerWarning":112,"g5I+bs":73,"history/lib/Actions":119}],103:[function(require,module,exports){
+},{"./TransitionUtils":97,"./computeChangedRoutes":100,"./getComponents":105,"./isActive":109,"./matchRoutes":112,"./routerWarning":113,"g5I+bs":73,"history/lib/Actions":120}],104:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -6324,7 +7261,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 exports.default = deprecateObjectProperties;
 }).call(this,require("g5I+bs"))
-},{"./routerWarning":112,"g5I+bs":73}],104:[function(require,module,exports){
+},{"./routerWarning":113,"g5I+bs":73}],105:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6371,7 +7308,7 @@ function getComponents(nextState, callback) {
 
 exports.default = getComponents;
 module.exports = exports['default'];
-},{"./AsyncUtils":78,"./makeStateWithLocation":109}],105:[function(require,module,exports){
+},{"./AsyncUtils":79,"./makeStateWithLocation":110}],106:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6398,7 +7335,7 @@ function getRouteParams(route, params) {
 
 exports.default = getRouteParams;
 module.exports = exports['default'];
-},{"./PatternUtils":86}],106:[function(require,module,exports){
+},{"./PatternUtils":87}],107:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6415,7 +7352,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = (0, _createRouterHistory2.default)(_createHashHistory2.default);
 module.exports = exports['default'];
-},{"./createRouterHistory":101,"history/lib/createHashHistory":127}],107:[function(require,module,exports){
+},{"./createRouterHistory":102,"history/lib/createHashHistory":128}],108:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6572,7 +7509,7 @@ exports.applyRouterMiddleware = _applyRouterMiddleware3.default;
 exports.browserHistory = _browserHistory3.default;
 exports.hashHistory = _hashHistory3.default;
 exports.createMemoryHistory = _createMemoryHistory3.default;
-},{"./History":79,"./IndexLink":80,"./IndexRedirect":81,"./IndexRoute":82,"./Lifecycle":84,"./Link":85,"./PatternUtils":86,"./PropTypes":87,"./Redirect":88,"./Route":89,"./RouteContext":90,"./RouteUtils":91,"./Router":92,"./RouterContext":93,"./RoutingContext":95,"./applyRouterMiddleware":97,"./browserHistory":98,"./createMemoryHistory":100,"./hashHistory":106,"./match":110,"./useRouterHistory":113,"./useRoutes":114,"./withRouter":115}],108:[function(require,module,exports){
+},{"./History":80,"./IndexLink":81,"./IndexRedirect":82,"./IndexRoute":83,"./Lifecycle":85,"./Link":86,"./PatternUtils":87,"./PropTypes":88,"./Redirect":89,"./Route":90,"./RouteContext":91,"./RouteUtils":92,"./Router":93,"./RouterContext":94,"./RoutingContext":96,"./applyRouterMiddleware":98,"./browserHistory":99,"./createMemoryHistory":101,"./hashHistory":107,"./match":111,"./useRouterHistory":114,"./useRoutes":115,"./withRouter":116}],109:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6725,7 +7662,7 @@ function isActive(_ref, indexOnly, currentLocation, routes, params) {
   return queryIsActive(query, currentLocation.query);
 }
 module.exports = exports['default'];
-},{"./PatternUtils":86}],109:[function(require,module,exports){
+},{"./PatternUtils":87}],110:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -6777,7 +7714,7 @@ function makeStateWithLocation(state, location) {
 }
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./deprecateObjectProperties":103,"./routerWarning":112,"g5I+bs":73}],110:[function(require,module,exports){
+},{"./deprecateObjectProperties":104,"./routerWarning":113,"g5I+bs":73}],111:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -6861,7 +7798,7 @@ function match(_ref, callback) {
 exports.default = match;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./RouteUtils":91,"./RouterUtils":94,"./createMemoryHistory":100,"./createTransitionManager":102,"g5I+bs":73,"invariant":39}],111:[function(require,module,exports){
+},{"./RouteUtils":92,"./RouterUtils":95,"./createMemoryHistory":101,"./createTransitionManager":103,"g5I+bs":73,"invariant":39}],112:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -7115,7 +8052,7 @@ function matchRoutes(routes, location, callback, remainingPathname) {
 }
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./AsyncUtils":78,"./PatternUtils":86,"./RouteUtils":91,"./makeStateWithLocation":109,"./routerWarning":112,"g5I+bs":73}],112:[function(require,module,exports){
+},{"./AsyncUtils":79,"./PatternUtils":87,"./RouteUtils":92,"./makeStateWithLocation":110,"./routerWarning":113,"g5I+bs":73}],113:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -7152,7 +8089,7 @@ function routerWarning(falseToWarn, message) {
 function _resetWarned() {
   warned = {};
 }
-},{"warning":136}],113:[function(require,module,exports){
+},{"warning":137}],114:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -7176,7 +8113,7 @@ function useRouterHistory(createHistory) {
   };
 }
 module.exports = exports['default'];
-},{"history/lib/useBasename":133,"history/lib/useQueries":134}],114:[function(require,module,exports){
+},{"history/lib/useBasename":134,"history/lib/useQueries":135}],115:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -7230,7 +8167,7 @@ function useRoutes(createHistory) {
 exports.default = useRoutes;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./createTransitionManager":102,"./routerWarning":112,"g5I+bs":73,"history/lib/useQueries":134}],115:[function(require,module,exports){
+},{"./createTransitionManager":103,"./routerWarning":113,"g5I+bs":73,"history/lib/useQueries":135}],116:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -7297,7 +8234,7 @@ function withRouter(WrappedComponent, options) {
 }
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./PropTypes":87,"g5I+bs":73,"hoist-non-react-statics":38,"invariant":39,"react":265}],116:[function(require,module,exports){
+},{"./PropTypes":88,"g5I+bs":73,"hoist-non-react-statics":38,"invariant":39,"react":267}],117:[function(require,module,exports){
 var pSlice = Array.prototype.slice;
 var objectKeys = require('./lib/keys.js');
 var isArguments = require('./lib/is_arguments.js');
@@ -7393,7 +8330,7 @@ function objEquiv(a, b, opts) {
   return typeof a === typeof b;
 }
 
-},{"./lib/is_arguments.js":117,"./lib/keys.js":118}],117:[function(require,module,exports){
+},{"./lib/is_arguments.js":118,"./lib/keys.js":119}],118:[function(require,module,exports){
 var supportsArgumentsClass = (function(){
   return Object.prototype.toString.call(arguments)
 })() == '[object Arguments]';
@@ -7415,7 +8352,7 @@ function unsupported(object){
     false;
 };
 
-},{}],118:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 exports = module.exports = typeof Object.keys === 'function'
   ? Object.keys : shim;
 
@@ -7426,7 +8363,7 @@ function shim (obj) {
   return keys;
 }
 
-},{}],119:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 /**
  * Indicates that navigation was caused by a call to history.push.
  */
@@ -7458,7 +8395,7 @@ exports['default'] = {
   REPLACE: REPLACE,
   POP: POP
 };
-},{}],120:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7517,7 +8454,7 @@ function loopAsync(turns, work, callback) {
 
   next();
 }
-},{}],121:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 (function (process){
 /*eslint-disable no-empty */
 'use strict';
@@ -7593,7 +8530,7 @@ function readState(key) {
   return null;
 }
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73,"warning":135}],122:[function(require,module,exports){
+},{"g5I+bs":73,"warning":136}],123:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -7669,13 +8606,13 @@ function supportsGoWithoutReloadUsingHash() {
   var ua = navigator.userAgent;
   return ua.indexOf('Firefox') === -1;
 }
-},{}],123:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 exports.canUseDOM = canUseDOM;
-},{}],124:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -7725,7 +8662,7 @@ function parsePath(path) {
   };
 }
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73,"warning":135}],125:[function(require,module,exports){
+},{"g5I+bs":73,"warning":136}],126:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -7908,7 +8845,7 @@ function createBrowserHistory() {
 exports['default'] = createBrowserHistory;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./Actions":119,"./DOMStateStorage":121,"./DOMUtils":122,"./ExecutionEnvironment":123,"./PathUtils":124,"./createDOMHistory":126,"g5I+bs":73,"invariant":39}],126:[function(require,module,exports){
+},{"./Actions":120,"./DOMStateStorage":122,"./DOMUtils":123,"./ExecutionEnvironment":124,"./PathUtils":125,"./createDOMHistory":127,"g5I+bs":73,"invariant":39}],127:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -7951,7 +8888,7 @@ function createDOMHistory(options) {
 exports['default'] = createDOMHistory;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./DOMUtils":122,"./ExecutionEnvironment":123,"./createHistory":128,"g5I+bs":73,"invariant":39}],127:[function(require,module,exports){
+},{"./DOMUtils":123,"./ExecutionEnvironment":124,"./createHistory":129,"g5I+bs":73,"invariant":39}],128:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8200,7 +9137,7 @@ function createHashHistory() {
 exports['default'] = createHashHistory;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./Actions":119,"./DOMStateStorage":121,"./DOMUtils":122,"./ExecutionEnvironment":123,"./PathUtils":124,"./createDOMHistory":126,"g5I+bs":73,"invariant":39,"warning":135}],128:[function(require,module,exports){
+},{"./Actions":120,"./DOMStateStorage":122,"./DOMUtils":123,"./ExecutionEnvironment":124,"./PathUtils":125,"./createDOMHistory":127,"g5I+bs":73,"invariant":39,"warning":136}],129:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8491,7 +9428,7 @@ function createHistory() {
 exports['default'] = createHistory;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./Actions":119,"./AsyncUtils":120,"./PathUtils":124,"./createLocation":129,"./deprecate":131,"./runTransitionHook":132,"deep-equal":116,"g5I+bs":73,"warning":135}],129:[function(require,module,exports){
+},{"./Actions":120,"./AsyncUtils":121,"./PathUtils":125,"./createLocation":130,"./deprecate":132,"./runTransitionHook":133,"deep-equal":117,"g5I+bs":73,"warning":136}],130:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8545,7 +9482,7 @@ function createLocation() {
 exports['default'] = createLocation;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./Actions":119,"./PathUtils":124,"g5I+bs":73,"warning":135}],130:[function(require,module,exports){
+},{"./Actions":120,"./PathUtils":125,"g5I+bs":73,"warning":136}],131:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8702,7 +9639,7 @@ function createMemoryHistory() {
 exports['default'] = createMemoryHistory;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./Actions":119,"./PathUtils":124,"./createHistory":128,"g5I+bs":73,"invariant":39,"warning":135}],131:[function(require,module,exports){
+},{"./Actions":120,"./PathUtils":125,"./createHistory":129,"g5I+bs":73,"invariant":39,"warning":136}],132:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8724,7 +9661,7 @@ function deprecate(fn, message) {
 exports['default'] = deprecate;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73,"warning":135}],132:[function(require,module,exports){
+},{"g5I+bs":73,"warning":136}],133:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8751,7 +9688,7 @@ function runTransitionHook(hook, location, callback) {
 exports['default'] = runTransitionHook;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73,"warning":135}],133:[function(require,module,exports){
+},{"g5I+bs":73,"warning":136}],134:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8912,7 +9849,7 @@ function useBasename(createHistory) {
 exports['default'] = useBasename;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./ExecutionEnvironment":123,"./PathUtils":124,"./deprecate":131,"./runTransitionHook":132,"g5I+bs":73,"warning":135}],134:[function(require,module,exports){
+},{"./ExecutionEnvironment":124,"./PathUtils":125,"./deprecate":132,"./runTransitionHook":133,"g5I+bs":73,"warning":136}],135:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -9091,11 +10028,203 @@ function useQueries(createHistory) {
 exports['default'] = useQueries;
 module.exports = exports['default'];
 }).call(this,require("g5I+bs"))
-},{"./PathUtils":124,"./deprecate":131,"./runTransitionHook":132,"g5I+bs":73,"query-string":74,"warning":135}],135:[function(require,module,exports){
-module.exports=require(37)
-},{"g5I+bs":73}],136:[function(require,module,exports){
+},{"./PathUtils":125,"./deprecate":132,"./runTransitionHook":133,"g5I+bs":73,"query-string":74,"warning":136}],136:[function(require,module,exports){
 module.exports=require(37)
 },{"g5I+bs":73}],137:[function(require,module,exports){
+module.exports=require(37)
+},{"g5I+bs":73}],138:[function(require,module,exports){
+'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var React = require('react');
+
+var Swipeable = React.createClass({
+  displayName: 'Swipeable',
+
+  propTypes: {
+    onSwiped: React.PropTypes.func,
+    onSwiping: React.PropTypes.func,
+    onSwipingUp: React.PropTypes.func,
+    onSwipingRight: React.PropTypes.func,
+    onSwipingDown: React.PropTypes.func,
+    onSwipingLeft: React.PropTypes.func,
+    onSwipedUp: React.PropTypes.func,
+    onSwipedRight: React.PropTypes.func,
+    onSwipedDown: React.PropTypes.func,
+    onSwipedLeft: React.PropTypes.func,
+    flickThreshold: React.PropTypes.number,
+    delta: React.PropTypes.number,
+    preventDefaultTouchmoveEvent: React.PropTypes.bool,
+    stopPropagation: React.PropTypes.bool,
+    nodeName: React.PropTypes.string
+  },
+
+  getInitialState: function getInitialState() {
+    return {
+      x: null,
+      y: null,
+      swiping: false,
+      start: 0
+    };
+  },
+
+  getDefaultProps: function getDefaultProps() {
+    return {
+      flickThreshold: 0.6,
+      delta: 10,
+      preventDefaultTouchmoveEvent: true,
+      stopPropagation: false,
+      nodeName: 'div'
+    };
+  },
+
+  calculatePos: function calculatePos(e) {
+    var x = e.changedTouches[0].clientX;
+    var y = e.changedTouches[0].clientY;
+
+    var xd = this.state.x - x;
+    var yd = this.state.y - y;
+
+    var axd = Math.abs(xd);
+    var ayd = Math.abs(yd);
+
+    var time = Date.now() - this.state.start;
+    var velocity = Math.sqrt(axd * axd + ayd * ayd) / time;
+
+    return {
+      deltaX: xd,
+      deltaY: yd,
+      absX: axd,
+      absY: ayd,
+      velocity: velocity
+    };
+  },
+
+  touchStart: function touchStart(e) {
+    if (e.touches.length > 1) {
+      return;
+    }
+
+    if (this.props.stopPropagation) e.stopPropagation();
+
+    this.setState({
+      start: Date.now(),
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      swiping: false
+    });
+  },
+
+  touchMove: function touchMove(e) {
+    if (!this.state.x || !this.state.y || e.touches.length > 1) {
+      return;
+    }
+
+    var cancelPageSwipe = false;
+    var pos = this.calculatePos(e);
+
+    if (pos.absX < this.props.delta && pos.absY < this.props.delta) {
+      return;
+    }
+
+    if (this.props.stopPropagation) e.stopPropagation();
+
+    if (this.props.onSwiping) {
+      this.props.onSwiping(e, pos.deltaX, pos.deltaY, pos.absX, pos.absY, pos.velocity);
+    }
+
+    if (pos.absX > pos.absY) {
+      if (pos.deltaX > 0) {
+        if (this.props.onSwipingLeft || this.props.onSwipedLeft) {
+          this.props.onSwipingLeft && this.props.onSwipingLeft(e, pos.absX);
+          cancelPageSwipe = true;
+        }
+      } else {
+        if (this.props.onSwipingRight || this.props.onSwipedRight) {
+          this.props.onSwipingRight && this.props.onSwipingRight(e, pos.absX);
+          cancelPageSwipe = true;
+        }
+      }
+    } else {
+      if (pos.deltaY > 0) {
+        if (this.props.onSwipingUp || this.props.onSwipedUp) {
+          this.props.onSwipingUp && this.props.onSwipingUp(e, pos.absY);
+          cancelPageSwipe = true;
+        }
+      } else {
+        if (this.props.onSwipingDown || this.props.onSwipedDown) {
+          this.props.onSwipingDown && this.props.onSwipingDown(e, pos.absY);
+          cancelPageSwipe = true;
+        }
+      }
+    }
+
+    this.setState({ swiping: true });
+
+    if (cancelPageSwipe && this.props.preventDefaultTouchmoveEvent) {
+      e.preventDefault();
+    }
+  },
+
+  touchEnd: function touchEnd(e) {
+    if (this.state.swiping) {
+      var pos = this.calculatePos(e);
+
+      if (this.props.stopPropagation) e.stopPropagation();
+
+      var isFlick = pos.velocity > this.props.flickThreshold;
+
+      this.props.onSwiped && this.props.onSwiped(e, pos.deltaX, pos.deltaY, isFlick, pos.velocity);
+
+      if (pos.absX > pos.absY) {
+        if (pos.deltaX > 0) {
+          this.props.onSwipedLeft && this.props.onSwipedLeft(e, pos.deltaX, isFlick);
+        } else {
+          this.props.onSwipedRight && this.props.onSwipedRight(e, pos.deltaX, isFlick);
+        }
+      } else {
+        if (pos.deltaY > 0) {
+          this.props.onSwipedUp && this.props.onSwipedUp(e, pos.deltaY, isFlick);
+        } else {
+          this.props.onSwipedDown && this.props.onSwipedDown(e, pos.deltaY, isFlick);
+        }
+      }
+    }
+
+    this.setState(this.getInitialState());
+  },
+
+  render: function render() {
+    var newProps = _extends({}, this.props, {
+      onTouchStart: this.touchStart,
+      onTouchMove: this.touchMove,
+      onTouchEnd: this.touchEnd
+    });
+
+    delete newProps.onSwiped;
+    delete newProps.onSwiping;
+    delete newProps.onSwipingUp;
+    delete newProps.onSwipingRight;
+    delete newProps.onSwipingDown;
+    delete newProps.onSwipingLeft;
+    delete newProps.onSwipedUp;
+    delete newProps.onSwipedRight;
+    delete newProps.onSwipedDown;
+    delete newProps.onSwipedLeft;
+    delete newProps.flickThreshold;
+    delete newProps.delta;
+    delete newProps.preventDefaultTouchmoveEvent;
+    delete newProps.stopPropagation;
+    delete newProps.nodeName;
+    delete newProps.children;
+
+    return React.createElement(this.props.nodeName, newProps, this.props.children);
+  }
+});
+
+module.exports = Swipeable;
+},{"react":267}],139:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -9132,7 +10261,7 @@ var AutoFocusUtils = {
 };
 
 module.exports = AutoFocusUtils;
-},{"./ReactMount":201,"./findDOMNode":244,"fbjs/lib/focusNode":10}],138:[function(require,module,exports){
+},{"./ReactMount":203,"./findDOMNode":246,"fbjs/lib/focusNode":10}],140:[function(require,module,exports){
 /**
  * Copyright 2013-2015 Facebook, Inc.
  * All rights reserved.
@@ -9538,7 +10667,7 @@ var BeforeInputEventPlugin = {
 };
 
 module.exports = BeforeInputEventPlugin;
-},{"./EventConstants":150,"./EventPropagators":154,"./FallbackCompositionState":155,"./SyntheticCompositionEvent":226,"./SyntheticInputEvent":230,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/keyOf":20}],139:[function(require,module,exports){
+},{"./EventConstants":152,"./EventPropagators":156,"./FallbackCompositionState":157,"./SyntheticCompositionEvent":228,"./SyntheticInputEvent":232,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/keyOf":20}],141:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -9678,7 +10807,7 @@ var CSSProperty = {
 };
 
 module.exports = CSSProperty;
-},{}],140:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -9856,7 +10985,7 @@ ReactPerf.measureMethods(CSSPropertyOperations, 'CSSPropertyOperations', {
 
 module.exports = CSSPropertyOperations;
 }).call(this,require("g5I+bs"))
-},{"./CSSProperty":139,"./ReactPerf":207,"./dangerousStyleValue":241,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/camelizeStyleName":4,"fbjs/lib/hyphenateStyleName":15,"fbjs/lib/memoizeStringOnly":22,"fbjs/lib/warning":27,"g5I+bs":73}],141:[function(require,module,exports){
+},{"./CSSProperty":141,"./ReactPerf":209,"./dangerousStyleValue":243,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/camelizeStyleName":4,"fbjs/lib/hyphenateStyleName":15,"fbjs/lib/memoizeStringOnly":22,"fbjs/lib/warning":27,"g5I+bs":73}],143:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -9952,7 +11081,7 @@ PooledClass.addPoolingTo(CallbackQueue);
 
 module.exports = CallbackQueue;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./PooledClass":159,"fbjs/lib/invariant":16,"g5I+bs":73}],142:[function(require,module,exports){
+},{"./Object.assign":160,"./PooledClass":161,"fbjs/lib/invariant":16,"g5I+bs":73}],144:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -10274,7 +11403,7 @@ var ChangeEventPlugin = {
 };
 
 module.exports = ChangeEventPlugin;
-},{"./EventConstants":150,"./EventPluginHub":151,"./EventPropagators":154,"./ReactUpdates":219,"./SyntheticEvent":228,"./getEventTarget":250,"./isEventSupported":255,"./isTextInputElement":256,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/keyOf":20}],143:[function(require,module,exports){
+},{"./EventConstants":152,"./EventPluginHub":153,"./EventPropagators":156,"./ReactUpdates":221,"./SyntheticEvent":230,"./getEventTarget":252,"./isEventSupported":257,"./isTextInputElement":258,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/keyOf":20}],145:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -10298,7 +11427,7 @@ var ClientReactRootIndex = {
 };
 
 module.exports = ClientReactRootIndex;
-},{}],144:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -10430,7 +11559,7 @@ ReactPerf.measureMethods(DOMChildrenOperations, 'DOMChildrenOperations', {
 
 module.exports = DOMChildrenOperations;
 }).call(this,require("g5I+bs"))
-},{"./Danger":147,"./ReactMultiChildUpdateTypes":203,"./ReactPerf":207,"./setInnerHTML":260,"./setTextContent":261,"fbjs/lib/invariant":16,"g5I+bs":73}],145:[function(require,module,exports){
+},{"./Danger":149,"./ReactMultiChildUpdateTypes":205,"./ReactPerf":209,"./setInnerHTML":262,"./setTextContent":263,"fbjs/lib/invariant":16,"g5I+bs":73}],147:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -10667,7 +11796,7 @@ var DOMProperty = {
 
 module.exports = DOMProperty;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/invariant":16,"g5I+bs":73}],146:[function(require,module,exports){
+},{"fbjs/lib/invariant":16,"g5I+bs":73}],148:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -10895,7 +12024,7 @@ ReactPerf.measureMethods(DOMPropertyOperations, 'DOMPropertyOperations', {
 
 module.exports = DOMPropertyOperations;
 }).call(this,require("g5I+bs"))
-},{"./DOMProperty":145,"./ReactPerf":207,"./quoteAttributeValueForBrowser":258,"fbjs/lib/warning":27,"g5I+bs":73}],147:[function(require,module,exports){
+},{"./DOMProperty":147,"./ReactPerf":209,"./quoteAttributeValueForBrowser":260,"fbjs/lib/warning":27,"g5I+bs":73}],149:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -11043,7 +12172,7 @@ var Danger = {
 
 module.exports = Danger;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/createNodesFromMarkup":7,"fbjs/lib/emptyFunction":8,"fbjs/lib/getMarkupWrap":12,"fbjs/lib/invariant":16,"g5I+bs":73}],148:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/createNodesFromMarkup":7,"fbjs/lib/emptyFunction":8,"fbjs/lib/getMarkupWrap":12,"fbjs/lib/invariant":16,"g5I+bs":73}],150:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -11071,7 +12200,7 @@ var keyOf = require('fbjs/lib/keyOf');
 var DefaultEventPluginOrder = [keyOf({ ResponderEventPlugin: null }), keyOf({ SimpleEventPlugin: null }), keyOf({ TapEventPlugin: null }), keyOf({ EnterLeaveEventPlugin: null }), keyOf({ ChangeEventPlugin: null }), keyOf({ SelectEventPlugin: null }), keyOf({ BeforeInputEventPlugin: null })];
 
 module.exports = DefaultEventPluginOrder;
-},{"fbjs/lib/keyOf":20}],149:[function(require,module,exports){
+},{"fbjs/lib/keyOf":20}],151:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -11196,7 +12325,7 @@ var EnterLeaveEventPlugin = {
 };
 
 module.exports = EnterLeaveEventPlugin;
-},{"./EventConstants":150,"./EventPropagators":154,"./ReactMount":201,"./SyntheticMouseEvent":232,"fbjs/lib/keyOf":20}],150:[function(require,module,exports){
+},{"./EventConstants":152,"./EventPropagators":156,"./ReactMount":203,"./SyntheticMouseEvent":234,"fbjs/lib/keyOf":20}],152:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -11289,7 +12418,7 @@ var EventConstants = {
 };
 
 module.exports = EventConstants;
-},{"fbjs/lib/keyMirror":19}],151:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":19}],153:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -11571,7 +12700,7 @@ var EventPluginHub = {
 
 module.exports = EventPluginHub;
 }).call(this,require("g5I+bs"))
-},{"./EventPluginRegistry":152,"./EventPluginUtils":153,"./ReactErrorUtils":192,"./accumulateInto":238,"./forEachAccumulated":246,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],152:[function(require,module,exports){
+},{"./EventPluginRegistry":154,"./EventPluginUtils":155,"./ReactErrorUtils":194,"./accumulateInto":240,"./forEachAccumulated":248,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],154:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -11794,7 +12923,7 @@ var EventPluginRegistry = {
 
 module.exports = EventPluginRegistry;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/invariant":16,"g5I+bs":73}],153:[function(require,module,exports){
+},{"fbjs/lib/invariant":16,"g5I+bs":73}],155:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -11999,7 +13128,7 @@ var EventPluginUtils = {
 
 module.exports = EventPluginUtils;
 }).call(this,require("g5I+bs"))
-},{"./EventConstants":150,"./ReactErrorUtils":192,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],154:[function(require,module,exports){
+},{"./EventConstants":152,"./ReactErrorUtils":194,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],156:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -12137,7 +13266,7 @@ var EventPropagators = {
 
 module.exports = EventPropagators;
 }).call(this,require("g5I+bs"))
-},{"./EventConstants":150,"./EventPluginHub":151,"./accumulateInto":238,"./forEachAccumulated":246,"fbjs/lib/warning":27,"g5I+bs":73}],155:[function(require,module,exports){
+},{"./EventConstants":152,"./EventPluginHub":153,"./accumulateInto":240,"./forEachAccumulated":248,"fbjs/lib/warning":27,"g5I+bs":73}],157:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -12233,7 +13362,7 @@ assign(FallbackCompositionState.prototype, {
 PooledClass.addPoolingTo(FallbackCompositionState);
 
 module.exports = FallbackCompositionState;
-},{"./Object.assign":158,"./PooledClass":159,"./getTextContentAccessor":253}],156:[function(require,module,exports){
+},{"./Object.assign":160,"./PooledClass":161,"./getTextContentAccessor":255}],158:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -12464,7 +13593,7 @@ var HTMLDOMPropertyConfig = {
 };
 
 module.exports = HTMLDOMPropertyConfig;
-},{"./DOMProperty":145,"fbjs/lib/ExecutionEnvironment":2}],157:[function(require,module,exports){
+},{"./DOMProperty":147,"fbjs/lib/ExecutionEnvironment":2}],159:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -12601,7 +13730,7 @@ var LinkedValueUtils = {
 
 module.exports = LinkedValueUtils;
 }).call(this,require("g5I+bs"))
-},{"./ReactPropTypeLocations":209,"./ReactPropTypes":210,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],158:[function(require,module,exports){
+},{"./ReactPropTypeLocations":211,"./ReactPropTypes":212,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],160:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -12649,7 +13778,7 @@ function assign(target, sources) {
 }
 
 module.exports = assign;
-},{}],159:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -12771,7 +13900,7 @@ var PooledClass = {
 
 module.exports = PooledClass;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/invariant":16,"g5I+bs":73}],160:[function(require,module,exports){
+},{"fbjs/lib/invariant":16,"g5I+bs":73}],162:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -12812,7 +13941,7 @@ React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOM;
 React.__SECRET_DOM_SERVER_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOMServer;
 
 module.exports = React;
-},{"./Object.assign":158,"./ReactDOM":171,"./ReactDOMServer":181,"./ReactIsomorphic":199,"./deprecated":242}],161:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactDOM":173,"./ReactDOMServer":183,"./ReactIsomorphic":201,"./deprecated":244}],163:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -12851,7 +13980,7 @@ var ReactBrowserComponentMixin = {
 
 module.exports = ReactBrowserComponentMixin;
 }).call(this,require("g5I+bs"))
-},{"./ReactInstanceMap":198,"./findDOMNode":244,"fbjs/lib/warning":27,"g5I+bs":73}],162:[function(require,module,exports){
+},{"./ReactInstanceMap":200,"./findDOMNode":246,"fbjs/lib/warning":27,"g5I+bs":73}],164:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -13176,7 +14305,7 @@ ReactPerf.measureMethods(ReactBrowserEventEmitter, 'ReactBrowserEventEmitter', {
 });
 
 module.exports = ReactBrowserEventEmitter;
-},{"./EventConstants":150,"./EventPluginHub":151,"./EventPluginRegistry":152,"./Object.assign":158,"./ReactEventEmitterMixin":193,"./ReactPerf":207,"./ViewportMetrics":237,"./isEventSupported":255}],163:[function(require,module,exports){
+},{"./EventConstants":152,"./EventPluginHub":153,"./EventPluginRegistry":154,"./Object.assign":160,"./ReactEventEmitterMixin":195,"./ReactPerf":209,"./ViewportMetrics":239,"./isEventSupported":257}],165:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -13301,7 +14430,7 @@ var ReactChildReconciler = {
 
 module.exports = ReactChildReconciler;
 }).call(this,require("g5I+bs"))
-},{"./ReactReconciler":212,"./instantiateReactComponent":254,"./shouldUpdateReactComponent":262,"./traverseAllChildren":263,"fbjs/lib/warning":27,"g5I+bs":73}],164:[function(require,module,exports){
+},{"./ReactReconciler":214,"./instantiateReactComponent":256,"./shouldUpdateReactComponent":264,"./traverseAllChildren":265,"fbjs/lib/warning":27,"g5I+bs":73}],166:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -13484,7 +14613,7 @@ var ReactChildren = {
 };
 
 module.exports = ReactChildren;
-},{"./PooledClass":159,"./ReactElement":188,"./traverseAllChildren":263,"fbjs/lib/emptyFunction":8}],165:[function(require,module,exports){
+},{"./PooledClass":161,"./ReactElement":190,"./traverseAllChildren":265,"fbjs/lib/emptyFunction":8}],167:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -14258,7 +15387,7 @@ var ReactClass = {
 
 module.exports = ReactClass;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./ReactComponent":166,"./ReactElement":188,"./ReactNoopUpdateQueue":205,"./ReactPropTypeLocationNames":208,"./ReactPropTypeLocations":209,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"fbjs/lib/keyMirror":19,"fbjs/lib/keyOf":20,"fbjs/lib/warning":27,"g5I+bs":73}],166:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactComponent":168,"./ReactElement":190,"./ReactNoopUpdateQueue":207,"./ReactPropTypeLocationNames":210,"./ReactPropTypeLocations":211,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"fbjs/lib/keyMirror":19,"fbjs/lib/keyOf":20,"fbjs/lib/warning":27,"g5I+bs":73}],168:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -14383,7 +15512,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactComponent;
 }).call(this,require("g5I+bs"))
-},{"./ReactNoopUpdateQueue":205,"./canDefineProperty":240,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],167:[function(require,module,exports){
+},{"./ReactNoopUpdateQueue":207,"./canDefineProperty":242,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],169:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -14425,7 +15554,7 @@ var ReactComponentBrowserEnvironment = {
 };
 
 module.exports = ReactComponentBrowserEnvironment;
-},{"./ReactDOMIDOperations":176,"./ReactMount":201}],168:[function(require,module,exports){
+},{"./ReactDOMIDOperations":178,"./ReactMount":203}],170:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -14479,7 +15608,7 @@ var ReactComponentEnvironment = {
 
 module.exports = ReactComponentEnvironment;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/invariant":16,"g5I+bs":73}],169:[function(require,module,exports){
+},{"fbjs/lib/invariant":16,"g5I+bs":73}],171:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -15176,7 +16305,7 @@ var ReactCompositeComponent = {
 
 module.exports = ReactCompositeComponent;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./ReactComponentEnvironment":168,"./ReactCurrentOwner":170,"./ReactElement":188,"./ReactInstanceMap":198,"./ReactPerf":207,"./ReactPropTypeLocationNames":208,"./ReactPropTypeLocations":209,"./ReactReconciler":212,"./ReactUpdateQueue":218,"./shouldUpdateReactComponent":262,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],170:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactComponentEnvironment":170,"./ReactCurrentOwner":172,"./ReactElement":190,"./ReactInstanceMap":200,"./ReactPerf":209,"./ReactPropTypeLocationNames":210,"./ReactPropTypeLocations":211,"./ReactReconciler":214,"./ReactUpdateQueue":220,"./shouldUpdateReactComponent":264,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],172:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -15207,7 +16336,7 @@ var ReactCurrentOwner = {
 };
 
 module.exports = ReactCurrentOwner;
-},{}],171:[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -15302,7 +16431,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = React;
 }).call(this,require("g5I+bs"))
-},{"./ReactCurrentOwner":170,"./ReactDOMTextComponent":182,"./ReactDefaultInjection":185,"./ReactInstanceHandles":197,"./ReactMount":201,"./ReactPerf":207,"./ReactReconciler":212,"./ReactUpdates":219,"./ReactVersion":220,"./findDOMNode":244,"./renderSubtreeIntoContainer":259,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/warning":27,"g5I+bs":73}],172:[function(require,module,exports){
+},{"./ReactCurrentOwner":172,"./ReactDOMTextComponent":184,"./ReactDefaultInjection":187,"./ReactInstanceHandles":199,"./ReactMount":203,"./ReactPerf":209,"./ReactReconciler":214,"./ReactUpdates":221,"./ReactVersion":222,"./findDOMNode":246,"./renderSubtreeIntoContainer":261,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/warning":27,"g5I+bs":73}],174:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -15353,7 +16482,7 @@ var ReactDOMButton = {
 };
 
 module.exports = ReactDOMButton;
-},{}],173:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -16318,7 +17447,7 @@ assign(ReactDOMComponent.prototype, ReactDOMComponent.Mixin, ReactMultiChild.Mix
 
 module.exports = ReactDOMComponent;
 }).call(this,require("g5I+bs"))
-},{"./AutoFocusUtils":137,"./CSSPropertyOperations":140,"./DOMProperty":145,"./DOMPropertyOperations":146,"./EventConstants":150,"./Object.assign":158,"./ReactBrowserEventEmitter":162,"./ReactComponentBrowserEnvironment":167,"./ReactDOMButton":172,"./ReactDOMInput":177,"./ReactDOMOption":178,"./ReactDOMSelect":179,"./ReactDOMTextarea":183,"./ReactMount":201,"./ReactMultiChild":202,"./ReactPerf":207,"./ReactUpdateQueue":218,"./canDefineProperty":240,"./escapeTextContentForBrowser":243,"./isEventSupported":255,"./setInnerHTML":260,"./setTextContent":261,"./validateDOMNesting":264,"fbjs/lib/invariant":16,"fbjs/lib/keyOf":20,"fbjs/lib/shallowEqual":25,"fbjs/lib/warning":27,"g5I+bs":73}],174:[function(require,module,exports){
+},{"./AutoFocusUtils":139,"./CSSPropertyOperations":142,"./DOMProperty":147,"./DOMPropertyOperations":148,"./EventConstants":152,"./Object.assign":160,"./ReactBrowserEventEmitter":164,"./ReactComponentBrowserEnvironment":169,"./ReactDOMButton":174,"./ReactDOMInput":179,"./ReactDOMOption":180,"./ReactDOMSelect":181,"./ReactDOMTextarea":185,"./ReactMount":203,"./ReactMultiChild":204,"./ReactPerf":209,"./ReactUpdateQueue":220,"./canDefineProperty":242,"./escapeTextContentForBrowser":245,"./isEventSupported":257,"./setInnerHTML":262,"./setTextContent":263,"./validateDOMNesting":266,"fbjs/lib/invariant":16,"fbjs/lib/keyOf":20,"fbjs/lib/shallowEqual":25,"fbjs/lib/warning":27,"g5I+bs":73}],176:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -16498,7 +17627,7 @@ var ReactDOMFactories = mapObject({
 
 module.exports = ReactDOMFactories;
 }).call(this,require("g5I+bs"))
-},{"./ReactElement":188,"./ReactElementValidator":189,"fbjs/lib/mapObject":21,"g5I+bs":73}],175:[function(require,module,exports){
+},{"./ReactElement":190,"./ReactElementValidator":191,"fbjs/lib/mapObject":21,"g5I+bs":73}],177:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -16517,7 +17646,7 @@ var ReactDOMFeatureFlags = {
 };
 
 module.exports = ReactDOMFeatureFlags;
-},{}],176:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -16614,7 +17743,7 @@ ReactPerf.measureMethods(ReactDOMIDOperations, 'ReactDOMIDOperations', {
 
 module.exports = ReactDOMIDOperations;
 }).call(this,require("g5I+bs"))
-},{"./DOMChildrenOperations":144,"./DOMPropertyOperations":146,"./ReactMount":201,"./ReactPerf":207,"fbjs/lib/invariant":16,"g5I+bs":73}],177:[function(require,module,exports){
+},{"./DOMChildrenOperations":146,"./DOMPropertyOperations":148,"./ReactMount":203,"./ReactPerf":209,"fbjs/lib/invariant":16,"g5I+bs":73}],179:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -16770,7 +17899,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMInput;
 }).call(this,require("g5I+bs"))
-},{"./LinkedValueUtils":157,"./Object.assign":158,"./ReactDOMIDOperations":176,"./ReactMount":201,"./ReactUpdates":219,"fbjs/lib/invariant":16,"g5I+bs":73}],178:[function(require,module,exports){
+},{"./LinkedValueUtils":159,"./Object.assign":160,"./ReactDOMIDOperations":178,"./ReactMount":203,"./ReactUpdates":221,"fbjs/lib/invariant":16,"g5I+bs":73}],180:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -16862,7 +17991,7 @@ var ReactDOMOption = {
 
 module.exports = ReactDOMOption;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./ReactChildren":164,"./ReactDOMSelect":179,"fbjs/lib/warning":27,"g5I+bs":73}],179:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactChildren":166,"./ReactDOMSelect":181,"fbjs/lib/warning":27,"g5I+bs":73}],181:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -17053,7 +18182,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMSelect;
 }).call(this,require("g5I+bs"))
-},{"./LinkedValueUtils":157,"./Object.assign":158,"./ReactMount":201,"./ReactUpdates":219,"fbjs/lib/warning":27,"g5I+bs":73}],180:[function(require,module,exports){
+},{"./LinkedValueUtils":159,"./Object.assign":160,"./ReactMount":203,"./ReactUpdates":221,"fbjs/lib/warning":27,"g5I+bs":73}],182:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -17266,7 +18395,7 @@ var ReactDOMSelection = {
 };
 
 module.exports = ReactDOMSelection;
-},{"./getNodeForCharacterOffset":252,"./getTextContentAccessor":253,"fbjs/lib/ExecutionEnvironment":2}],181:[function(require,module,exports){
+},{"./getNodeForCharacterOffset":254,"./getTextContentAccessor":255,"fbjs/lib/ExecutionEnvironment":2}],183:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -17293,7 +18422,7 @@ var ReactDOMServer = {
 };
 
 module.exports = ReactDOMServer;
-},{"./ReactDefaultInjection":185,"./ReactServerRendering":216,"./ReactVersion":220}],182:[function(require,module,exports){
+},{"./ReactDefaultInjection":187,"./ReactServerRendering":218,"./ReactVersion":222}],184:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -17423,7 +18552,7 @@ assign(ReactDOMTextComponent.prototype, {
 
 module.exports = ReactDOMTextComponent;
 }).call(this,require("g5I+bs"))
-},{"./DOMChildrenOperations":144,"./DOMPropertyOperations":146,"./Object.assign":158,"./ReactComponentBrowserEnvironment":167,"./ReactMount":201,"./escapeTextContentForBrowser":243,"./setTextContent":261,"./validateDOMNesting":264,"g5I+bs":73}],183:[function(require,module,exports){
+},{"./DOMChildrenOperations":146,"./DOMPropertyOperations":148,"./Object.assign":160,"./ReactComponentBrowserEnvironment":169,"./ReactMount":203,"./escapeTextContentForBrowser":245,"./setTextContent":263,"./validateDOMNesting":266,"g5I+bs":73}],185:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -17539,7 +18668,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMTextarea;
 }).call(this,require("g5I+bs"))
-},{"./LinkedValueUtils":157,"./Object.assign":158,"./ReactDOMIDOperations":176,"./ReactUpdates":219,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],184:[function(require,module,exports){
+},{"./LinkedValueUtils":159,"./Object.assign":160,"./ReactDOMIDOperations":178,"./ReactUpdates":221,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],186:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -17607,7 +18736,7 @@ var ReactDefaultBatchingStrategy = {
 };
 
 module.exports = ReactDefaultBatchingStrategy;
-},{"./Object.assign":158,"./ReactUpdates":219,"./Transaction":236,"fbjs/lib/emptyFunction":8}],185:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactUpdates":221,"./Transaction":238,"fbjs/lib/emptyFunction":8}],187:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -17707,7 +18836,7 @@ module.exports = {
   inject: inject
 };
 }).call(this,require("g5I+bs"))
-},{"./BeforeInputEventPlugin":138,"./ChangeEventPlugin":142,"./ClientReactRootIndex":143,"./DefaultEventPluginOrder":148,"./EnterLeaveEventPlugin":149,"./HTMLDOMPropertyConfig":156,"./ReactBrowserComponentMixin":161,"./ReactComponentBrowserEnvironment":167,"./ReactDOMComponent":173,"./ReactDOMTextComponent":182,"./ReactDefaultBatchingStrategy":184,"./ReactDefaultPerf":186,"./ReactEventListener":194,"./ReactInjection":195,"./ReactInstanceHandles":197,"./ReactMount":201,"./ReactReconcileTransaction":211,"./SVGDOMPropertyConfig":221,"./SelectEventPlugin":222,"./ServerReactRootIndex":223,"./SimpleEventPlugin":224,"fbjs/lib/ExecutionEnvironment":2,"g5I+bs":73}],186:[function(require,module,exports){
+},{"./BeforeInputEventPlugin":140,"./ChangeEventPlugin":144,"./ClientReactRootIndex":145,"./DefaultEventPluginOrder":150,"./EnterLeaveEventPlugin":151,"./HTMLDOMPropertyConfig":158,"./ReactBrowserComponentMixin":163,"./ReactComponentBrowserEnvironment":169,"./ReactDOMComponent":175,"./ReactDOMTextComponent":184,"./ReactDefaultBatchingStrategy":186,"./ReactDefaultPerf":188,"./ReactEventListener":196,"./ReactInjection":197,"./ReactInstanceHandles":199,"./ReactMount":203,"./ReactReconcileTransaction":213,"./SVGDOMPropertyConfig":223,"./SelectEventPlugin":224,"./ServerReactRootIndex":225,"./SimpleEventPlugin":226,"fbjs/lib/ExecutionEnvironment":2,"g5I+bs":73}],188:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -17945,7 +19074,7 @@ var ReactDefaultPerf = {
 };
 
 module.exports = ReactDefaultPerf;
-},{"./DOMProperty":145,"./ReactDefaultPerfAnalysis":187,"./ReactMount":201,"./ReactPerf":207,"fbjs/lib/performanceNow":24}],187:[function(require,module,exports){
+},{"./DOMProperty":147,"./ReactDefaultPerfAnalysis":189,"./ReactMount":203,"./ReactPerf":209,"fbjs/lib/performanceNow":24}],189:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -18147,7 +19276,7 @@ var ReactDefaultPerfAnalysis = {
 };
 
 module.exports = ReactDefaultPerfAnalysis;
-},{"./Object.assign":158}],188:[function(require,module,exports){
+},{"./Object.assign":160}],190:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -18397,7 +19526,7 @@ ReactElement.isValidElement = function (object) {
 
 module.exports = ReactElement;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./ReactCurrentOwner":170,"./canDefineProperty":240,"g5I+bs":73}],189:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactCurrentOwner":172,"./canDefineProperty":242,"g5I+bs":73}],191:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -18681,7 +19810,7 @@ var ReactElementValidator = {
 
 module.exports = ReactElementValidator;
 }).call(this,require("g5I+bs"))
-},{"./ReactCurrentOwner":170,"./ReactElement":188,"./ReactPropTypeLocationNames":208,"./ReactPropTypeLocations":209,"./canDefineProperty":240,"./getIteratorFn":251,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],190:[function(require,module,exports){
+},{"./ReactCurrentOwner":172,"./ReactElement":190,"./ReactPropTypeLocationNames":210,"./ReactPropTypeLocations":211,"./canDefineProperty":242,"./getIteratorFn":253,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],192:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -18737,7 +19866,7 @@ assign(ReactEmptyComponent.prototype, {
 ReactEmptyComponent.injection = ReactEmptyComponentInjection;
 
 module.exports = ReactEmptyComponent;
-},{"./Object.assign":158,"./ReactElement":188,"./ReactEmptyComponentRegistry":191,"./ReactReconciler":212}],191:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactElement":190,"./ReactEmptyComponentRegistry":193,"./ReactReconciler":214}],193:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -18786,7 +19915,7 @@ var ReactEmptyComponentRegistry = {
 };
 
 module.exports = ReactEmptyComponentRegistry;
-},{}],192:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -18866,7 +19995,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactErrorUtils;
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73}],193:[function(require,module,exports){
+},{"g5I+bs":73}],195:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -18905,7 +20034,7 @@ var ReactEventEmitterMixin = {
 };
 
 module.exports = ReactEventEmitterMixin;
-},{"./EventPluginHub":151}],194:[function(require,module,exports){
+},{"./EventPluginHub":153}],196:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -19117,7 +20246,7 @@ var ReactEventListener = {
 };
 
 module.exports = ReactEventListener;
-},{"./Object.assign":158,"./PooledClass":159,"./ReactInstanceHandles":197,"./ReactMount":201,"./ReactUpdates":219,"./getEventTarget":250,"fbjs/lib/EventListener":1,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/getUnboundedScrollPosition":13}],195:[function(require,module,exports){
+},{"./Object.assign":160,"./PooledClass":161,"./ReactInstanceHandles":199,"./ReactMount":203,"./ReactUpdates":221,"./getEventTarget":252,"fbjs/lib/EventListener":1,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/getUnboundedScrollPosition":13}],197:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -19156,7 +20285,7 @@ var ReactInjection = {
 };
 
 module.exports = ReactInjection;
-},{"./DOMProperty":145,"./EventPluginHub":151,"./ReactBrowserEventEmitter":162,"./ReactClass":165,"./ReactComponentEnvironment":168,"./ReactEmptyComponent":190,"./ReactNativeComponent":204,"./ReactPerf":207,"./ReactRootIndex":214,"./ReactUpdates":219}],196:[function(require,module,exports){
+},{"./DOMProperty":147,"./EventPluginHub":153,"./ReactBrowserEventEmitter":164,"./ReactClass":167,"./ReactComponentEnvironment":170,"./ReactEmptyComponent":192,"./ReactNativeComponent":206,"./ReactPerf":209,"./ReactRootIndex":216,"./ReactUpdates":221}],198:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -19281,7 +20410,7 @@ var ReactInputSelection = {
 };
 
 module.exports = ReactInputSelection;
-},{"./ReactDOMSelection":180,"fbjs/lib/containsNode":5,"fbjs/lib/focusNode":10,"fbjs/lib/getActiveElement":11}],197:[function(require,module,exports){
+},{"./ReactDOMSelection":182,"fbjs/lib/containsNode":5,"fbjs/lib/focusNode":10,"fbjs/lib/getActiveElement":11}],199:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -19586,7 +20715,7 @@ var ReactInstanceHandles = {
 
 module.exports = ReactInstanceHandles;
 }).call(this,require("g5I+bs"))
-},{"./ReactRootIndex":214,"fbjs/lib/invariant":16,"g5I+bs":73}],198:[function(require,module,exports){
+},{"./ReactRootIndex":216,"fbjs/lib/invariant":16,"g5I+bs":73}],200:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -19634,7 +20763,7 @@ var ReactInstanceMap = {
 };
 
 module.exports = ReactInstanceMap;
-},{}],199:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -19711,7 +20840,7 @@ var React = {
 
 module.exports = React;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./ReactChildren":164,"./ReactClass":165,"./ReactComponent":166,"./ReactDOMFactories":174,"./ReactElement":188,"./ReactElementValidator":189,"./ReactPropTypes":210,"./ReactVersion":220,"./onlyChild":257,"g5I+bs":73}],200:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactChildren":166,"./ReactClass":167,"./ReactComponent":168,"./ReactDOMFactories":176,"./ReactElement":190,"./ReactElementValidator":191,"./ReactPropTypes":212,"./ReactVersion":222,"./onlyChild":259,"g5I+bs":73}],202:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -19757,7 +20886,7 @@ var ReactMarkupChecksum = {
 };
 
 module.exports = ReactMarkupChecksum;
-},{"./adler32":239}],201:[function(require,module,exports){
+},{"./adler32":241}],203:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -20610,7 +21739,7 @@ ReactPerf.measureMethods(ReactMount, 'ReactMount', {
 
 module.exports = ReactMount;
 }).call(this,require("g5I+bs"))
-},{"./DOMProperty":145,"./Object.assign":158,"./ReactBrowserEventEmitter":162,"./ReactCurrentOwner":170,"./ReactDOMFeatureFlags":175,"./ReactElement":188,"./ReactEmptyComponentRegistry":191,"./ReactInstanceHandles":197,"./ReactInstanceMap":198,"./ReactMarkupChecksum":200,"./ReactPerf":207,"./ReactReconciler":212,"./ReactUpdateQueue":218,"./ReactUpdates":219,"./instantiateReactComponent":254,"./setInnerHTML":260,"./shouldUpdateReactComponent":262,"./validateDOMNesting":264,"fbjs/lib/containsNode":5,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],202:[function(require,module,exports){
+},{"./DOMProperty":147,"./Object.assign":160,"./ReactBrowserEventEmitter":164,"./ReactCurrentOwner":172,"./ReactDOMFeatureFlags":177,"./ReactElement":190,"./ReactEmptyComponentRegistry":193,"./ReactInstanceHandles":199,"./ReactInstanceMap":200,"./ReactMarkupChecksum":202,"./ReactPerf":209,"./ReactReconciler":214,"./ReactUpdateQueue":220,"./ReactUpdates":221,"./instantiateReactComponent":256,"./setInnerHTML":262,"./shouldUpdateReactComponent":264,"./validateDOMNesting":266,"fbjs/lib/containsNode":5,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],204:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -21109,7 +22238,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 }).call(this,require("g5I+bs"))
-},{"./ReactChildReconciler":163,"./ReactComponentEnvironment":168,"./ReactCurrentOwner":170,"./ReactMultiChildUpdateTypes":203,"./ReactReconciler":212,"./flattenChildren":245,"g5I+bs":73}],203:[function(require,module,exports){
+},{"./ReactChildReconciler":165,"./ReactComponentEnvironment":170,"./ReactCurrentOwner":172,"./ReactMultiChildUpdateTypes":205,"./ReactReconciler":214,"./flattenChildren":247,"g5I+bs":73}],205:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -21142,7 +22271,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 });
 
 module.exports = ReactMultiChildUpdateTypes;
-},{"fbjs/lib/keyMirror":19}],204:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":19}],206:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -21239,7 +22368,7 @@ var ReactNativeComponent = {
 
 module.exports = ReactNativeComponent;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"fbjs/lib/invariant":16,"g5I+bs":73}],205:[function(require,module,exports){
+},{"./Object.assign":160,"fbjs/lib/invariant":16,"g5I+bs":73}],207:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015, Facebook, Inc.
@@ -21360,7 +22489,7 @@ var ReactNoopUpdateQueue = {
 
 module.exports = ReactNoopUpdateQueue;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/warning":27,"g5I+bs":73}],206:[function(require,module,exports){
+},{"fbjs/lib/warning":27,"g5I+bs":73}],208:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -21454,7 +22583,7 @@ var ReactOwner = {
 
 module.exports = ReactOwner;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/invariant":16,"g5I+bs":73}],207:[function(require,module,exports){
+},{"fbjs/lib/invariant":16,"g5I+bs":73}],209:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -21553,7 +22682,7 @@ function _noMeasure(objName, fnName, func) {
 
 module.exports = ReactPerf;
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73}],208:[function(require,module,exports){
+},{"g5I+bs":73}],210:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -21580,7 +22709,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactPropTypeLocationNames;
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73}],209:[function(require,module,exports){
+},{"g5I+bs":73}],211:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -21603,7 +22732,7 @@ var ReactPropTypeLocations = keyMirror({
 });
 
 module.exports = ReactPropTypeLocations;
-},{"fbjs/lib/keyMirror":19}],210:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":19}],212:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -21960,7 +23089,7 @@ function getClassName(propValue) {
 }
 
 module.exports = ReactPropTypes;
-},{"./ReactElement":188,"./ReactPropTypeLocationNames":208,"./getIteratorFn":251,"fbjs/lib/emptyFunction":8}],211:[function(require,module,exports){
+},{"./ReactElement":190,"./ReactPropTypeLocationNames":210,"./getIteratorFn":253,"fbjs/lib/emptyFunction":8}],213:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -22112,7 +23241,7 @@ assign(ReactReconcileTransaction.prototype, Transaction.Mixin, Mixin);
 PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
-},{"./CallbackQueue":141,"./Object.assign":158,"./PooledClass":159,"./ReactBrowserEventEmitter":162,"./ReactDOMFeatureFlags":175,"./ReactInputSelection":196,"./Transaction":236}],212:[function(require,module,exports){
+},{"./CallbackQueue":143,"./Object.assign":160,"./PooledClass":161,"./ReactBrowserEventEmitter":164,"./ReactDOMFeatureFlags":177,"./ReactInputSelection":198,"./Transaction":238}],214:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -22220,7 +23349,7 @@ var ReactReconciler = {
 };
 
 module.exports = ReactReconciler;
-},{"./ReactRef":213}],213:[function(require,module,exports){
+},{"./ReactRef":215}],215:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -22299,7 +23428,7 @@ ReactRef.detachRefs = function (instance, element) {
 };
 
 module.exports = ReactRef;
-},{"./ReactOwner":206}],214:[function(require,module,exports){
+},{"./ReactOwner":208}],216:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -22329,7 +23458,7 @@ var ReactRootIndex = {
 };
 
 module.exports = ReactRootIndex;
-},{}],215:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -22353,7 +23482,7 @@ var ReactServerBatchingStrategy = {
 };
 
 module.exports = ReactServerBatchingStrategy;
-},{}],216:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -22439,7 +23568,7 @@ module.exports = {
   renderToStaticMarkup: renderToStaticMarkup
 };
 }).call(this,require("g5I+bs"))
-},{"./ReactDefaultBatchingStrategy":184,"./ReactElement":188,"./ReactInstanceHandles":197,"./ReactMarkupChecksum":200,"./ReactServerBatchingStrategy":215,"./ReactServerRenderingTransaction":217,"./ReactUpdates":219,"./instantiateReactComponent":254,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"g5I+bs":73}],217:[function(require,module,exports){
+},{"./ReactDefaultBatchingStrategy":186,"./ReactElement":190,"./ReactInstanceHandles":199,"./ReactMarkupChecksum":202,"./ReactServerBatchingStrategy":217,"./ReactServerRenderingTransaction":219,"./ReactUpdates":221,"./instantiateReactComponent":256,"fbjs/lib/emptyObject":9,"fbjs/lib/invariant":16,"g5I+bs":73}],219:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -22527,7 +23656,7 @@ assign(ReactServerRenderingTransaction.prototype, Transaction.Mixin, Mixin);
 PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
-},{"./CallbackQueue":141,"./Object.assign":158,"./PooledClass":159,"./Transaction":236,"fbjs/lib/emptyFunction":8}],218:[function(require,module,exports){
+},{"./CallbackQueue":143,"./Object.assign":160,"./PooledClass":161,"./Transaction":238,"fbjs/lib/emptyFunction":8}],220:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015, Facebook, Inc.
@@ -22787,7 +23916,7 @@ var ReactUpdateQueue = {
 
 module.exports = ReactUpdateQueue;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./ReactCurrentOwner":170,"./ReactElement":188,"./ReactInstanceMap":198,"./ReactUpdates":219,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],219:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactCurrentOwner":172,"./ReactElement":190,"./ReactInstanceMap":200,"./ReactUpdates":221,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],221:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -23013,7 +24142,7 @@ var ReactUpdates = {
 
 module.exports = ReactUpdates;
 }).call(this,require("g5I+bs"))
-},{"./CallbackQueue":141,"./Object.assign":158,"./PooledClass":159,"./ReactPerf":207,"./ReactReconciler":212,"./Transaction":236,"fbjs/lib/invariant":16,"g5I+bs":73}],220:[function(require,module,exports){
+},{"./CallbackQueue":143,"./Object.assign":160,"./PooledClass":161,"./ReactPerf":209,"./ReactReconciler":214,"./Transaction":238,"fbjs/lib/invariant":16,"g5I+bs":73}],222:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -23028,7 +24157,7 @@ module.exports = ReactUpdates;
 'use strict';
 
 module.exports = '0.14.8';
-},{}],221:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -23156,7 +24285,7 @@ var SVGDOMPropertyConfig = {
 };
 
 module.exports = SVGDOMPropertyConfig;
-},{"./DOMProperty":145}],222:[function(require,module,exports){
+},{"./DOMProperty":147}],224:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -23358,7 +24487,7 @@ var SelectEventPlugin = {
 };
 
 module.exports = SelectEventPlugin;
-},{"./EventConstants":150,"./EventPropagators":154,"./ReactInputSelection":196,"./SyntheticEvent":228,"./isTextInputElement":256,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/getActiveElement":11,"fbjs/lib/keyOf":20,"fbjs/lib/shallowEqual":25}],223:[function(require,module,exports){
+},{"./EventConstants":152,"./EventPropagators":156,"./ReactInputSelection":198,"./SyntheticEvent":230,"./isTextInputElement":258,"fbjs/lib/ExecutionEnvironment":2,"fbjs/lib/getActiveElement":11,"fbjs/lib/keyOf":20,"fbjs/lib/shallowEqual":25}],225:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -23388,7 +24517,7 @@ var ServerReactRootIndex = {
 };
 
 module.exports = ServerReactRootIndex;
-},{}],224:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -23978,7 +25107,7 @@ var SimpleEventPlugin = {
 
 module.exports = SimpleEventPlugin;
 }).call(this,require("g5I+bs"))
-},{"./EventConstants":150,"./EventPropagators":154,"./ReactMount":201,"./SyntheticClipboardEvent":225,"./SyntheticDragEvent":227,"./SyntheticEvent":228,"./SyntheticFocusEvent":229,"./SyntheticKeyboardEvent":231,"./SyntheticMouseEvent":232,"./SyntheticTouchEvent":233,"./SyntheticUIEvent":234,"./SyntheticWheelEvent":235,"./getEventCharCode":247,"fbjs/lib/EventListener":1,"fbjs/lib/emptyFunction":8,"fbjs/lib/invariant":16,"fbjs/lib/keyOf":20,"g5I+bs":73}],225:[function(require,module,exports){
+},{"./EventConstants":152,"./EventPropagators":156,"./ReactMount":203,"./SyntheticClipboardEvent":227,"./SyntheticDragEvent":229,"./SyntheticEvent":230,"./SyntheticFocusEvent":231,"./SyntheticKeyboardEvent":233,"./SyntheticMouseEvent":234,"./SyntheticTouchEvent":235,"./SyntheticUIEvent":236,"./SyntheticWheelEvent":237,"./getEventCharCode":249,"fbjs/lib/EventListener":1,"fbjs/lib/emptyFunction":8,"fbjs/lib/invariant":16,"fbjs/lib/keyOf":20,"g5I+bs":73}],227:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24018,7 +25147,7 @@ function SyntheticClipboardEvent(dispatchConfig, dispatchMarker, nativeEvent, na
 SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 
 module.exports = SyntheticClipboardEvent;
-},{"./SyntheticEvent":228}],226:[function(require,module,exports){
+},{"./SyntheticEvent":230}],228:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24056,7 +25185,7 @@ function SyntheticCompositionEvent(dispatchConfig, dispatchMarker, nativeEvent, 
 SyntheticEvent.augmentClass(SyntheticCompositionEvent, CompositionEventInterface);
 
 module.exports = SyntheticCompositionEvent;
-},{"./SyntheticEvent":228}],227:[function(require,module,exports){
+},{"./SyntheticEvent":230}],229:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24094,7 +25223,7 @@ function SyntheticDragEvent(dispatchConfig, dispatchMarker, nativeEvent, nativeE
 SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
-},{"./SyntheticMouseEvent":232}],228:[function(require,module,exports){
+},{"./SyntheticMouseEvent":234}],230:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -24277,7 +25406,7 @@ PooledClass.addPoolingTo(SyntheticEvent, PooledClass.fourArgumentPooler);
 
 module.exports = SyntheticEvent;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./PooledClass":159,"fbjs/lib/emptyFunction":8,"fbjs/lib/warning":27,"g5I+bs":73}],229:[function(require,module,exports){
+},{"./Object.assign":160,"./PooledClass":161,"fbjs/lib/emptyFunction":8,"fbjs/lib/warning":27,"g5I+bs":73}],231:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24315,7 +25444,7 @@ function SyntheticFocusEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
-},{"./SyntheticUIEvent":234}],230:[function(require,module,exports){
+},{"./SyntheticUIEvent":236}],232:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24354,7 +25483,7 @@ function SyntheticInputEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticEvent.augmentClass(SyntheticInputEvent, InputEventInterface);
 
 module.exports = SyntheticInputEvent;
-},{"./SyntheticEvent":228}],231:[function(require,module,exports){
+},{"./SyntheticEvent":230}],233:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24440,7 +25569,7 @@ function SyntheticKeyboardEvent(dispatchConfig, dispatchMarker, nativeEvent, nat
 SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
-},{"./SyntheticUIEvent":234,"./getEventCharCode":247,"./getEventKey":248,"./getEventModifierState":249}],232:[function(require,module,exports){
+},{"./SyntheticUIEvent":236,"./getEventCharCode":249,"./getEventKey":250,"./getEventModifierState":251}],234:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24514,7 +25643,7 @@ function SyntheticMouseEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
-},{"./SyntheticUIEvent":234,"./ViewportMetrics":237,"./getEventModifierState":249}],233:[function(require,module,exports){
+},{"./SyntheticUIEvent":236,"./ViewportMetrics":239,"./getEventModifierState":251}],235:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24561,7 +25690,7 @@ function SyntheticTouchEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
-},{"./SyntheticUIEvent":234,"./getEventModifierState":249}],234:[function(require,module,exports){
+},{"./SyntheticUIEvent":236,"./getEventModifierState":251}],236:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24622,7 +25751,7 @@ function SyntheticUIEvent(dispatchConfig, dispatchMarker, nativeEvent, nativeEve
 SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
-},{"./SyntheticEvent":228,"./getEventTarget":250}],235:[function(require,module,exports){
+},{"./SyntheticEvent":230,"./getEventTarget":252}],237:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24678,7 +25807,7 @@ function SyntheticWheelEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
-},{"./SyntheticMouseEvent":232}],236:[function(require,module,exports){
+},{"./SyntheticMouseEvent":234}],238:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -24912,7 +26041,7 @@ var Transaction = {
 
 module.exports = Transaction;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/invariant":16,"g5I+bs":73}],237:[function(require,module,exports){
+},{"fbjs/lib/invariant":16,"g5I+bs":73}],239:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -24940,7 +26069,7 @@ var ViewportMetrics = {
 };
 
 module.exports = ViewportMetrics;
-},{}],238:[function(require,module,exports){
+},{}],240:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -25002,7 +26131,7 @@ function accumulateInto(current, next) {
 
 module.exports = accumulateInto;
 }).call(this,require("g5I+bs"))
-},{"fbjs/lib/invariant":16,"g5I+bs":73}],239:[function(require,module,exports){
+},{"fbjs/lib/invariant":16,"g5I+bs":73}],241:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25045,7 +26174,7 @@ function adler32(data) {
 }
 
 module.exports = adler32;
-},{}],240:[function(require,module,exports){
+},{}],242:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -25072,7 +26201,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = canDefineProperty;
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":73}],241:[function(require,module,exports){
+},{"g5I+bs":73}],243:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25128,7 +26257,7 @@ function dangerousStyleValue(name, value) {
 }
 
 module.exports = dangerousStyleValue;
-},{"./CSSProperty":139}],242:[function(require,module,exports){
+},{"./CSSProperty":141}],244:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -25179,7 +26308,7 @@ function deprecated(fnName, newModule, newPackage, ctx, fn) {
 
 module.exports = deprecated;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"fbjs/lib/warning":27,"g5I+bs":73}],243:[function(require,module,exports){
+},{"./Object.assign":160,"fbjs/lib/warning":27,"g5I+bs":73}],245:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25218,7 +26347,7 @@ function escapeTextContentForBrowser(text) {
 }
 
 module.exports = escapeTextContentForBrowser;
-},{}],244:[function(require,module,exports){
+},{}],246:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -25270,7 +26399,7 @@ function findDOMNode(componentOrElement) {
 
 module.exports = findDOMNode;
 }).call(this,require("g5I+bs"))
-},{"./ReactCurrentOwner":170,"./ReactInstanceMap":198,"./ReactMount":201,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],245:[function(require,module,exports){
+},{"./ReactCurrentOwner":172,"./ReactInstanceMap":200,"./ReactMount":203,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],247:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -25321,7 +26450,7 @@ function flattenChildren(children) {
 
 module.exports = flattenChildren;
 }).call(this,require("g5I+bs"))
-},{"./traverseAllChildren":263,"fbjs/lib/warning":27,"g5I+bs":73}],246:[function(require,module,exports){
+},{"./traverseAllChildren":265,"fbjs/lib/warning":27,"g5I+bs":73}],248:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25351,7 +26480,7 @@ var forEachAccumulated = function (arr, cb, scope) {
 };
 
 module.exports = forEachAccumulated;
-},{}],247:[function(require,module,exports){
+},{}],249:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25402,7 +26531,7 @@ function getEventCharCode(nativeEvent) {
 }
 
 module.exports = getEventCharCode;
-},{}],248:[function(require,module,exports){
+},{}],250:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25506,7 +26635,7 @@ function getEventKey(nativeEvent) {
 }
 
 module.exports = getEventKey;
-},{"./getEventCharCode":247}],249:[function(require,module,exports){
+},{"./getEventCharCode":249}],251:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25551,7 +26680,7 @@ function getEventModifierState(nativeEvent) {
 }
 
 module.exports = getEventModifierState;
-},{}],250:[function(require,module,exports){
+},{}],252:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25581,7 +26710,7 @@ function getEventTarget(nativeEvent) {
 }
 
 module.exports = getEventTarget;
-},{}],251:[function(require,module,exports){
+},{}],253:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25622,7 +26751,7 @@ function getIteratorFn(maybeIterable) {
 }
 
 module.exports = getIteratorFn;
-},{}],252:[function(require,module,exports){
+},{}],254:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25696,7 +26825,7 @@ function getNodeForCharacterOffset(root, offset) {
 }
 
 module.exports = getNodeForCharacterOffset;
-},{}],253:[function(require,module,exports){
+},{}],255:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25730,7 +26859,7 @@ function getTextContentAccessor() {
 }
 
 module.exports = getTextContentAccessor;
-},{"fbjs/lib/ExecutionEnvironment":2}],254:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":2}],256:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -25845,7 +26974,7 @@ function instantiateReactComponent(node) {
 
 module.exports = instantiateReactComponent;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"./ReactCompositeComponent":169,"./ReactEmptyComponent":190,"./ReactNativeComponent":204,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],255:[function(require,module,exports){
+},{"./Object.assign":160,"./ReactCompositeComponent":171,"./ReactEmptyComponent":192,"./ReactNativeComponent":206,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],257:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25906,7 +27035,7 @@ function isEventSupported(eventNameSuffix, capture) {
 }
 
 module.exports = isEventSupported;
-},{"fbjs/lib/ExecutionEnvironment":2}],256:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":2}],258:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -25947,7 +27076,7 @@ function isTextInputElement(elem) {
 }
 
 module.exports = isTextInputElement;
-},{}],257:[function(require,module,exports){
+},{}],259:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -25983,7 +27112,7 @@ function onlyChild(children) {
 
 module.exports = onlyChild;
 }).call(this,require("g5I+bs"))
-},{"./ReactElement":188,"fbjs/lib/invariant":16,"g5I+bs":73}],258:[function(require,module,exports){
+},{"./ReactElement":190,"fbjs/lib/invariant":16,"g5I+bs":73}],260:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -26010,7 +27139,7 @@ function quoteAttributeValueForBrowser(value) {
 }
 
 module.exports = quoteAttributeValueForBrowser;
-},{"./escapeTextContentForBrowser":243}],259:[function(require,module,exports){
+},{"./escapeTextContentForBrowser":245}],261:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -26027,7 +27156,7 @@ module.exports = quoteAttributeValueForBrowser;
 var ReactMount = require('./ReactMount');
 
 module.exports = ReactMount.renderSubtreeIntoContainer;
-},{"./ReactMount":201}],260:[function(require,module,exports){
+},{"./ReactMount":203}],262:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -26118,7 +27247,7 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 module.exports = setInnerHTML;
-},{"fbjs/lib/ExecutionEnvironment":2}],261:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":2}],263:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -26159,7 +27288,7 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 module.exports = setTextContent;
-},{"./escapeTextContentForBrowser":243,"./setInnerHTML":260,"fbjs/lib/ExecutionEnvironment":2}],262:[function(require,module,exports){
+},{"./escapeTextContentForBrowser":245,"./setInnerHTML":262,"fbjs/lib/ExecutionEnvironment":2}],264:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -26203,7 +27332,7 @@ function shouldUpdateReactComponent(prevElement, nextElement) {
 }
 
 module.exports = shouldUpdateReactComponent;
-},{}],263:[function(require,module,exports){
+},{}],265:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -26395,7 +27524,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 
 module.exports = traverseAllChildren;
 }).call(this,require("g5I+bs"))
-},{"./ReactCurrentOwner":170,"./ReactElement":188,"./ReactInstanceHandles":197,"./getIteratorFn":251,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],264:[function(require,module,exports){
+},{"./ReactCurrentOwner":172,"./ReactElement":190,"./ReactInstanceHandles":199,"./getIteratorFn":253,"fbjs/lib/invariant":16,"fbjs/lib/warning":27,"g5I+bs":73}],266:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015, Facebook, Inc.
@@ -26761,12 +27890,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = validateDOMNesting;
 }).call(this,require("g5I+bs"))
-},{"./Object.assign":158,"fbjs/lib/emptyFunction":8,"fbjs/lib/warning":27,"g5I+bs":73}],265:[function(require,module,exports){
+},{"./Object.assign":160,"fbjs/lib/emptyFunction":8,"fbjs/lib/warning":27,"g5I+bs":73}],267:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/React');
 
-},{"./lib/React":160}],266:[function(require,module,exports){
+},{"./lib/React":162}],268:[function(require,module,exports){
 'use strict';
 module.exports = function (str) {
 	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
@@ -26774,29 +27903,39 @@ module.exports = function (str) {
 	});
 };
 
-},{}],267:[function(require,module,exports){
+},{}],269:[function(require,module,exports){
+'use strict';
+
 var React = require('react');
 
-var FeaturedCar = React.createClass({displayName: "FeaturedCar",
-  componentDidMount: function() {
+var FeaturedCar = React.createClass({
+  displayName: 'FeaturedCar',
+
+  componentDidMount: function componentDidMount() {
     console.log(this.props.displayImage);
   },
-  render: function() {
-    return (
-      React.createElement("div", {className: "item"}, 
-        React.createElement("div", {className: "carousel-caption"}, 
-          React.createElement("img", {src: this.props.image}), 
-          React.createElement("p", null, this.props.vin)
+  render: function render() {
+    return React.createElement(
+      'div',
+      { className: 'item' },
+      React.createElement(
+        'div',
+        { className: 'carousel-caption' },
+        React.createElement('img', { src: this.props.image }),
+        React.createElement(
+          'p',
+          null,
+          this.props.vin
         )
       )
-    )
+    );
   }
 });
 
 module.exports = FeaturedCar;
 
 
-},{"react":265}],268:[function(require,module,exports){
+},{"react":267}],270:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -26827,7 +27966,7 @@ var options = {
     routes: Routes,
     // supply a function that can be called
     // to resolve the file that was rendered.
-    viewResolver: function(viewName) {
+    viewResolver: function viewResolver(viewName) {
         return require('./views/' + viewName);
     }
 };
@@ -26837,17 +27976,28 @@ document.addEventListener('DOMContentLoaded', function onLoad() {
 });
 
 
-},{"../routes/react.jsx":275,"./views/cardetail.jsx":269,"./views/carlist.jsx":270,"./views/creditapp.jsx":271,"./views/index.jsx":272,"./views/layout.jsx":273,"./views/server.jsx":274,"react-engine/lib/client":76}],269:[function(require,module,exports){
+},{"../routes/react.jsx":277,"./views/cardetail.jsx":271,"./views/carlist.jsx":272,"./views/creditapp.jsx":273,"./views/index.jsx":274,"./views/layout.jsx":275,"./views/server.jsx":276,"react-engine/lib/client":76}],271:[function(require,module,exports){
+'use strict';
+
+var _reactImageGallery = require('react-image-gallery');
+
+var _reactImageGallery2 = _interopRequireDefault(_reactImageGallery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var React = require('react');
 
-var CarDetail = React.createClass({displayName: "CarDetail",
 
-  componentWillMount: function() {
+var CarDetail = React.createClass({
+  displayName: 'CarDetail',
+
+
+  componentWillMount: function componentWillMount() {
     var cars = this.props.cars;
     var vin = this.props.params.vin;
 
-    var car = cars.filter(function(obj) {
-      if(obj.vin == vin) {
+    var car = cars.filter(function (obj) {
+      if (obj.vin == vin) {
         return obj;
       }
     });
@@ -26870,43 +28020,145 @@ var CarDetail = React.createClass({displayName: "CarDetail",
         fuel: car.fuel,
         title: car.title
       }
-    }, function() {
-      console.log(this.state)
+    }, function () {
+      console.log(this.state);
     });
   },
+  render: function render() {
+    var images = [];
+    this.state.car.images.map(function (data, id) {
+      images.push({
+        original: data,
+        thumbnail: data
+      });
+    });
 
-  render: function() {
-    return (
-      React.createElement("div", {className: "container"}, 
-        React.createElement("div", {className: "car-detail"}, 
-          React.createElement("div", {className: "row"}, 
-            React.createElement("div", {className: "col-md-8"}, 
-              React.createElement("img", {src: this.state.car.images[0]})
-            ), 
-            React.createElement("div", {className: "col-md-4"}, 
-              React.createElement("h2", null, this.state.car.year, " - ", this.state.car.make, " ", this.state.car.model), 
-              React.createElement("p", null, "Mileage: ", this.state.car.miles), 
-              React.createElement("p", null, "Transmission Type: ", this.state.car.transmission), 
-              React.createElement("p", null, "Fuel Type: ", this.state.car.fuel), 
-              React.createElement("p", null, "Engine: ", this.state.car.engine), 
-              React.createElement("p", null, "Title: ", this.state.car.title), 
-              React.createElement("p", null, "CARFAX: ", React.createElement("a", {href: "#"}, "Click for a CarFax Check!")), 
-              React.createElement("h6", null, "VIN#", this.state.car.vin), 
-              React.createElement("h3", null, "Internet Price: ", React.createElement("strong", null, "$", this.state.car.price))
+    return React.createElement(
+      'div',
+      { className: 'container' },
+      React.createElement(
+        'div',
+        { className: 'car-detail' },
+        React.createElement(
+          'div',
+          { className: 'row' },
+          React.createElement(
+            'div',
+            { className: 'col-md-8' },
+            React.createElement(_reactImageGallery2.default, { items: images, slideInterval: 2000 })
+          ),
+          React.createElement(
+            'div',
+            { className: 'col-md-4' },
+            React.createElement(
+              'h2',
+              null,
+              this.state.car.year,
+              ' - ',
+              this.state.car.make,
+              ' ',
+              this.state.car.model
+            ),
+            React.createElement(
+              'p',
+              null,
+              'Mileage: ',
+              this.state.car.miles
+            ),
+            React.createElement(
+              'p',
+              null,
+              'Transmission Type: ',
+              this.state.car.transmission
+            ),
+            React.createElement(
+              'p',
+              null,
+              'Fuel Type: ',
+              this.state.car.fuel
+            ),
+            React.createElement(
+              'p',
+              null,
+              'Engine: ',
+              this.state.car.engine
+            ),
+            React.createElement(
+              'p',
+              null,
+              'Title: ',
+              this.state.car.title
+            ),
+            React.createElement(
+              'p',
+              null,
+              'CARFAX: ',
+              React.createElement(
+                'a',
+                { href: '#' },
+                'Click for a CarFax Check!'
+              )
+            ),
+            React.createElement(
+              'h6',
+              null,
+              'VIN#',
+              this.state.car.vin
+            ),
+            React.createElement(
+              'h3',
+              null,
+              'Internet Price: ',
+              React.createElement(
+                'strong',
+                null,
+                '$',
+                this.state.car.price
+              )
             )
-          ), 
-          React.createElement("div", {className: "detail-contact-form"}, 
-            React.createElement("h4", null, "Interested?"), 
-            React.createElement("p", null, "Our vehicle experts are standing by to answer any questions:"), 
-            React.createElement("p", null, " ", React.createElement("strong", null, "Call Us"), " (877) 909-1919"), 
-            React.createElement("form", null, 
-              React.createElement("div", {className: "form-group"}, 
-                React.createElement("input", {type: "email", className: "form-control", placeholder: "Email **"})
-              ), 
-              React.createElement("div", {className: "form-group"}, 
-                React.createElement("textarea", {className: "form-control", value: 'I am interested in the ' + this.state.car.year + ' ' + this.state.car.make + ' ' + this.state.car.model + ' VIN#' + this.state.car.vin})
-              ), 
-              React.createElement("button", {type: "submit", className: "btn btn-default btn-block"}, "Contact Us")
+          )
+        ),
+        React.createElement(
+          'div',
+          { className: 'detail-contact-form' },
+          React.createElement(
+            'h4',
+            null,
+            'Interested?'
+          ),
+          React.createElement(
+            'p',
+            null,
+            'Our vehicle experts are standing by to answer any questions:'
+          ),
+          React.createElement(
+            'p',
+            null,
+            ' ',
+            React.createElement(
+              'strong',
+              null,
+              'Call Us'
+            ),
+            ' (877) 909-1919'
+          ),
+          React.createElement(
+            'form',
+            null,
+            React.createElement(
+              'div',
+              { className: 'form-group' },
+              React.createElement('input', { type: 'email', className: 'form-control', placeholder: 'Email **' })
+            ),
+            React.createElement(
+              'div',
+              { className: 'form-group' },
+              React.createElement('textarea', { className: 'form-control', value: 'I am interested in the ' + this.state.car.year + ' ' + this.state.car.make + ' ' + this.state.car.model + ' VIN#' + this.state.car.vin })
+            ),
+            React.createElement(
+              'button',
+              { type: 'submit', className: 'btn btn-default btn-block' },
+              'Contact Us'
             )
           )
         )
@@ -26918,258 +28170,648 @@ var CarDetail = React.createClass({displayName: "CarDetail",
 module.exports = CarDetail;
 
 
-},{"react":265}],270:[function(require,module,exports){
+},{"react":267,"react-image-gallery":78}],272:[function(require,module,exports){
+'use strict';
+
 var React = require('react');
 
-var CarList = React.createClass({displayName: "CarList",
-  render: function() {
-    return (
-      React.createElement("div", null, 
-        "THIS IS CARLIST"
-      )
-    )
+var CarList = React.createClass({
+  displayName: 'CarList',
+
+  render: function render() {
+    return React.createElement(
+      'div',
+      null,
+      'THIS IS CARLIST'
+    );
   }
-})
+});
 
 module.exports = CarList;
 
 
-},{"react":265}],271:[function(require,module,exports){
+},{"react":267}],273:[function(require,module,exports){
+'use strict';
+
 var React = require('react');
 var Router = require('react-router');
 
+var CreditApp = React.createClass({
+  displayName: 'CreditApp',
 
-var CreditApp = React.createClass({displayName: "CreditApp",
-  onSubmit: function(e) {
+  onSubmit: function onSubmit(e) {
     e.preventDefault();
 
-    setTimeout(function() {
+    setTimeout(function () {
       $('.credit-submit-form').modal('hide');
       Router.browserHistory.push('/');
     }, 7000);
   },
 
-  render: function() {
-    return (
-      React.createElement("div", {className: "container"}, 
-        React.createElement("div", {className: "credit-app"}, 
-          React.createElement("form", {onSubmit: this.onSubmit}, 
-            React.createElement("h4", {className: "credit-app-header"}, "Personal Information"), 
-            React.createElement("div", {className: "form-group"}, 
-              React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("input", {type: "text", placeholder: "First Name*", className: "form-control custom-border"})
-                ), 
-                React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("input", {type: "text", placeholder: "Last Name*", className: "form-control custom-border"})
-                )
-              ), 
-              React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-9"}, 
-                  React.createElement("input", {type: "text", placeholder: "Address*", className: "form-control custom-border"})
-                ), 
-                React.createElement("div", {className: "col-md-3"}, 
-                  React.createElement("input", {type: "text", placeholder: "Telephone #*", className: "form-control custom-border"})
-                )
-              ), 
-              React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-3"}, 
-                  React.createElement("input", {type: "text", placeholder: "City*", className: "form-control custom-border"})
-                ), 
-                React.createElement("div", {className: "col-md-3"}, 
-                  React.createElement("input", {type: "text", placeholder: "State/Zip*", className: "form-control custom-border"})
-                ), 
-                React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("input", {type: "email", placeholder: "Email*", className: "form-control custom-border"})
-                )
-              ), 
-              React.createElement("h4", {className: "credit-app-header"}, "Employment Info"), 
-              React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("input", {type: "text", placeholder: "Company Name*", className: "form-control custom-border"})
-                ), 
-                React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("input", {type: "text", placeholder: "Telephone #*", className: "form-control custom-border"})
-                )
-              ), 
-              React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-7"}, 
-                  React.createElement("input", {type: "text", placeholder: "Business Address*", className: "form-control custom-border"})
-                ), 
-                React.createElement("div", {className: "col-md-5"}, 
-                  React.createElement("input", {type: "text", placeholder: "Position Held*", className: "form-control custom-border"})
-                )
-              ), 
-              React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("input", {type: "text", placeholder: "Time in Position*", className: "form-control custom-border"})
-                ), 
-                React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("input", {type: "text", placeholder: "Salary", className: "form-control custom-border"}), 
-                  React.createElement("label", null, 
-                    React.createElement("input", {type: "checkbox"}), " Hourly", 
-                    React.createElement("input", {type: "checkbox"}), " Monthly"
-                  )
+  render: function render() {
+    return React.createElement(
+      'div',
+      { className: 'container' },
+      React.createElement(
+        'div',
+        { className: 'credit-app' },
+        React.createElement(
+          'form',
+          { onSubmit: this.onSubmit },
+          React.createElement(
+            'h4',
+            { className: 'credit-app-header' },
+            'Personal Information'
+          ),
+          React.createElement(
+            'div',
+            { className: 'form-group' },
+            React.createElement(
+              'div',
+              { className: 'row' },
+              React.createElement(
+                'div',
+                { className: 'col-md-6' },
+                React.createElement('input', { type: 'text', placeholder: 'First Name*', className: 'form-control custom-border' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'col-md-6' },
+                React.createElement('input', { type: 'text', placeholder: 'Last Name*', className: 'form-control custom-border' })
+              )
+            ),
+            React.createElement(
+              'div',
+              { className: 'row' },
+              React.createElement(
+                'div',
+                { className: 'col-md-9' },
+                React.createElement('input', { type: 'text', placeholder: 'Address*', className: 'form-control custom-border' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'col-md-3' },
+                React.createElement('input', { type: 'text', placeholder: 'Telephone #*', className: 'form-control custom-border' })
+              )
+            ),
+            React.createElement(
+              'div',
+              { className: 'row' },
+              React.createElement(
+                'div',
+                { className: 'col-md-3' },
+                React.createElement('input', { type: 'text', placeholder: 'City*', className: 'form-control custom-border' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'col-md-3' },
+                React.createElement('input', { type: 'text', placeholder: 'State/Zip*', className: 'form-control custom-border' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'col-md-6' },
+                React.createElement('input', { type: 'email', placeholder: 'Email*', className: 'form-control custom-border' })
+              )
+            ),
+            React.createElement(
+              'h4',
+              { className: 'credit-app-header' },
+              'Employment Info'
+            ),
+            React.createElement(
+              'div',
+              { className: 'row' },
+              React.createElement(
+                'div',
+                { className: 'col-md-6' },
+                React.createElement('input', { type: 'text', placeholder: 'Company Name*', className: 'form-control custom-border' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'col-md-6' },
+                React.createElement('input', { type: 'text', placeholder: 'Telephone #*', className: 'form-control custom-border' })
+              )
+            ),
+            React.createElement(
+              'div',
+              { className: 'row' },
+              React.createElement(
+                'div',
+                { className: 'col-md-7' },
+                React.createElement('input', { type: 'text', placeholder: 'Business Address*', className: 'form-control custom-border' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'col-md-5' },
+                React.createElement('input', { type: 'text', placeholder: 'Position Held*', className: 'form-control custom-border' })
+              )
+            ),
+            React.createElement(
+              'div',
+              { className: 'row' },
+              React.createElement(
+                'div',
+                { className: 'col-md-6' },
+                React.createElement('input', { type: 'text', placeholder: 'Time in Position*', className: 'form-control custom-border' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'col-md-6' },
+                React.createElement('input', { type: 'text', placeholder: 'Salary', className: 'form-control custom-border' }),
+                React.createElement(
+                  'label',
+                  null,
+                  React.createElement('input', { type: 'checkbox' }),
+                  ' Hourly',
+                  React.createElement('input', { type: 'checkbox' }),
+                  ' Monthly'
                 )
               )
-            ), 
-            React.createElement("button", {type: "submit", className: "btn btn-default", "data-toggle": "modal", "data-target": ".credit-submit-form"}, "Submit")
+            )
+          ),
+          React.createElement(
+            'button',
+            { type: 'submit', className: 'btn btn-default', 'data-toggle': 'modal', 'data-target': '.credit-submit-form' },
+            'Submit'
           )
-        ), 
-        React.createElement("div", {className: "modal fade credit-submit-form", tabindex: "-1", role: "dialog", "aria-labelleby": "CreditSubmit"}, 
-          React.createElement("div", {className: "modal-dialog modal-lg", role: "document"}, 
-            React.createElement("div", {className: "modal-content"}, 
-              React.createElement("div", {className: "modal-header"}, 
-                React.createElement("button", {type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close"}, React.createElement("span", {"aria-hidden": "true"}, "×")), 
-                React.createElement("h3", {className: "modal-title"}, "ZAuto | West Hollywood")
-              ), 
-              React.createElement("div", {className: "modal-body"}, 
-                React.createElement("h4", null, "Thank you very much for your application.."), 
-                React.createElement("p", null, "We are reviewing your application now, and we will call you as soon as we have an answer for you!")
+        )
+      ),
+      React.createElement(
+        'div',
+        { className: 'modal fade credit-submit-form', tabindex: '-1', role: 'dialog', 'aria-labelleby': 'CreditSubmit' },
+        React.createElement(
+          'div',
+          { className: 'modal-dialog modal-lg', role: 'document' },
+          React.createElement(
+            'div',
+            { className: 'modal-content' },
+            React.createElement(
+              'div',
+              { className: 'modal-header' },
+              React.createElement(
+                'button',
+                { type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+                React.createElement(
+                  'span',
+                  { 'aria-hidden': 'true' },
+                  '×'
+                )
+              ),
+              React.createElement(
+                'h3',
+                { className: 'modal-title' },
+                'ZAuto | West Hollywood'
+              )
+            ),
+            React.createElement(
+              'div',
+              { className: 'modal-body' },
+              React.createElement(
+                'h4',
+                null,
+                'Thank you very much for your application..'
+              ),
+              React.createElement(
+                'p',
+                null,
+                'We are reviewing your application now, and we will call you as soon as we have an answer for you!'
               )
             )
           )
         )
       )
-    )
+    );
   }
 });
 
 module.exports = CreditApp;
 
 
-},{"react":265,"react-router":107}],272:[function(require,module,exports){
+},{"react":267,"react-router":108}],274:[function(require,module,exports){
+'use strict';
+
 var React = require('react');
 
 var FeaturedCar = require('../components/featuredcar.jsx');
 
 var Link = require('react-router').Link;
 
-var Index = React.createClass({displayName: "Index",
+var Index = React.createClass({
+  displayName: 'Index',
 
-  componentDidMount: function() {
-    $("#featured-cars").owlCarousel({
-      items: 1,
-      autoplay: true,
-      stopOnHover: true,
-      navigation: true
-    });
-  },
 
-  render: function() {
-    return (
-      React.createElement("div", {className: "container main-content"}, 
-        React.createElement("div", {className: "row"}, 
-          React.createElement("div", {className: "col-md-4"}, 
-            React.createElement("div", {className: "thumbnail"}, 
-              React.createElement("img", {src: this.props.cars[0].images[0], alt: "Card image cap"}), 
-              React.createElement("div", {className: "caption"}, 
-                React.createElement("h3", null, this.props.cars[0].year, " - ", this.props.cars[0].make, " ", this.props.cars[0].model), 
-                React.createElement("p", null, "Brand ", React.createElement("strong", null, "NEW"), "!!"), 
-                React.createElement("p", null, "2.5L V4 - Automatic transmission"), 
-                React.createElement("p", null, "Luxury Edition"), 
-                React.createElement("p", null, this.props.cars[0].miles, " miles!"), 
-                React.createElement(Link, {to: '/inventory/' + this.props.cars[0].make + '/' +this.props.cars[0].vin + '/' + this.props.cars[0].model}, "FIND OUT INTERNET PRICE")
-              )
-            )
-          ), 
-          React.createElement("div", {className: "col-md-4"}, 
-            React.createElement("div", {className: "thumbnail"}, 
-              React.createElement("img", {src: this.props.cars[1].images[0], alt: "Card image cap"}), 
-              React.createElement("div", {className: "caption"}, 
-                React.createElement("h3", null, this.props.cars[1].year, " - ", this.props.cars[1].make, " ", this.props.cars[1].model), 
-                React.createElement("p", null, React.createElement("strong", null, "Certified"), " pre-owned!"), 
-                React.createElement("p", null, "2.7L V6 - Automatic transmission"), 
-                React.createElement("p", null, "Standard Sport"), 
-                React.createElement("p", null, this.props.cars[1].miles, " miles!"), 
-                React.createElement(Link, {to: '/inventory/' + this.props.cars[1].make + '/' +this.props.cars[1].vin + '/' + this.props.cars[1].model}, "FIND OUT INTERNET PRICE")
-              )
-            )
-          ), 
-          React.createElement("div", {className: "col-md-4"}, 
-            React.createElement("div", {className: "thumbnail"}, 
-              React.createElement("img", {src: this.props.cars[2].images[0], alt: "Card image cap"}), 
-              React.createElement("div", {className: "caption"}, 
-                React.createElement("h3", null, this.props.cars[2].year, " - ", this.props.cars[2].make, " ", this.props.cars[2].model), 
-                React.createElement("p", null, React.createElement("strong", null, "Certified"), " pre-owned!"), 
-                React.createElement("p", null, "3.6L V6 - Manual transmission"), 
-                React.createElement("p", null, "Rubicon - Sports package w/ offroad tires"), 
-                React.createElement("p", null, this.props.cars[2].miles, " miles!"), 
-                React.createElement(Link, {to: '/inventory/' + this.props.cars[2].make + '/' +this.props.cars[2].vin + '/' + this.props.cars[2].model}, "FIND OUT INTERNET PRICE")
+  render: function render() {
+    return React.createElement(
+      'div',
+      { className: 'container main-content' },
+      React.createElement(
+        'div',
+        { className: 'row' },
+        React.createElement(
+          'div',
+          { className: 'col-md-4' },
+          React.createElement(
+            'div',
+            { className: 'thumbnail' },
+            React.createElement('img', { src: this.props.cars[0].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              'div',
+              { className: 'caption' },
+              React.createElement(
+                'h3',
+                null,
+                this.props.cars[0].year,
+                ' - ',
+                this.props.cars[0].make,
+                ' ',
+                this.props.cars[0].model
+              ),
+              React.createElement(
+                'p',
+                null,
+                'Brand ',
+                React.createElement(
+                  'strong',
+                  null,
+                  'NEW'
+                ),
+                '!!'
+              ),
+              React.createElement(
+                'p',
+                null,
+                '2.5L V4 - Automatic transmission'
+              ),
+              React.createElement(
+                'p',
+                null,
+                'Luxury Edition'
+              ),
+              React.createElement(
+                'p',
+                null,
+                this.props.cars[0].miles,
+                ' miles!'
+              ),
+              React.createElement(
+                Link,
+                { to: '/inventory/' + this.props.cars[0].make + '/' + this.props.cars[0].vin + '/' + this.props.cars[0].model },
+                'FIND OUT INTERNET PRICE'
               )
             )
           )
-        ), 
-        React.createElement("div", {className: "row"}, 
-          React.createElement("div", {className: "col-md-4"}, 
-            React.createElement("div", {className: "thumbnail"}, 
-              React.createElement("img", {src: this.props.cars[3].images[0], alt: "Card image cap"}), 
-              React.createElement("div", {className: "caption"}, 
-                React.createElement("h3", null, this.props.cars[3].year, " - ", this.props.cars[3].make, " ", this.props.cars[3].model), 
-                React.createElement("p", null, "Brand ", React.createElement("strong", null, "NEW"), "!!"), 
-                React.createElement("p", null, "2.5L V4 - Automatic transmission"), 
-                React.createElement("p", null, "SE-R Spec V"), 
-                React.createElement("p", null, this.props.cars[3].miles, " miles!"), 
-                React.createElement(Link, {to: '/inventory/' + this.props.cars[3].make + '/' +this.props.cars[3].vin + '/' + this.props.cars[3].model}, "FIND OUT INTERNET PRICE")
-              )
-            )
-          ), 
-          React.createElement("div", {className: "col-md-4"}, 
-            React.createElement("div", {className: "thumbnail"}, 
-              React.createElement("img", {src: this.props.cars[4].images[0], alt: "Card image cap"}), 
-              React.createElement("div", {className: "caption"}, 
-                React.createElement("h3", null, this.props.cars[4].year, " - ", this.props.cars[4].make, " ", this.props.cars[4].model), 
-                React.createElement("p", null, React.createElement("strong", null, "Certified"), " pre-owned!"), 
-                React.createElement("p", null, "3.5L V6 - Manual transmission"), 
-                React.createElement("p", null, "SE Limited"), 
-                React.createElement("p", null, this.props.cars[4].miles, " miles!"), 
-                React.createElement(Link, {to: '/inventory/' + this.props.cars[4].make + '/' +this.props.cars[4].vin + '/' + this.props.cars[4].model}, "FIND OUT INTERNET PRICE")
-              )
-            )
-          ), 
-          React.createElement("div", {className: "col-md-4"}, 
-            React.createElement("div", {className: "thumbnail"}, 
-              React.createElement("img", {src: this.props.cars[5].images[0], alt: "Card image cap"}), 
-              React.createElement("div", {className: "caption"}, 
-                React.createElement("h3", null, this.props.cars[5].year, " - ", this.props.cars[5].make, " ", this.props.cars[5].model), 
-                React.createElement("p", null, React.createElement("strong", null, "Certified"), " pre-owned!"), 
-                React.createElement("p", null, "1.8L V4 - Automatic transmission"), 
-                React.createElement("p", null, "LS"), 
-                React.createElement("p", null, this.props.cars[5].miles, " miles!"), 
-                React.createElement(Link, {to: '/inventory/' + this.props.cars[5].make + '/' +this.props.cars[5].vin + '/' + this.props.cars[5].model}, "FIND OUT INTERNET PRICE")
+        ),
+        React.createElement(
+          'div',
+          { className: 'col-md-4' },
+          React.createElement(
+            'div',
+            { className: 'thumbnail' },
+            React.createElement('img', { src: this.props.cars[1].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              'div',
+              { className: 'caption' },
+              React.createElement(
+                'h3',
+                null,
+                this.props.cars[1].year,
+                ' - ',
+                this.props.cars[1].make,
+                ' ',
+                this.props.cars[1].model
+              ),
+              React.createElement(
+                'p',
+                null,
+                React.createElement(
+                  'strong',
+                  null,
+                  'Certified'
+                ),
+                ' pre-owned!'
+              ),
+              React.createElement(
+                'p',
+                null,
+                '2.7L V6 - Automatic transmission'
+              ),
+              React.createElement(
+                'p',
+                null,
+                'Standard Sport'
+              ),
+              React.createElement(
+                'p',
+                null,
+                this.props.cars[1].miles,
+                ' miles!'
+              ),
+              React.createElement(
+                Link,
+                { to: '/inventory/' + this.props.cars[1].make + '/' + this.props.cars[1].vin + '/' + this.props.cars[1].model },
+                'FIND OUT INTERNET PRICE'
               )
             )
           )
-        ), 
-        React.createElement("div", {className: "car-box-menu"}, 
-          React.createElement("div", {className: "row"}, 
-            React.createElement("div", {className: "col-md-offset-2 col-md-8"}, 
-              React.createElement("ul", null, 
-                React.createElement("li", {className: "new-car"}, 
-                  React.createElement("a", {href: "#"}, 
-                    React.createElement("div", {className: "box"}, 
-                      React.createElement("div", {className: "box-text"}, 
-                        React.createElement("h4", null, "BROWSE"), 
-                        React.createElement("p", null, "NEW")
+        ),
+        React.createElement(
+          'div',
+          { className: 'col-md-4' },
+          React.createElement(
+            'div',
+            { className: 'thumbnail' },
+            React.createElement('img', { src: this.props.cars[2].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              'div',
+              { className: 'caption' },
+              React.createElement(
+                'h3',
+                null,
+                this.props.cars[2].year,
+                ' - ',
+                this.props.cars[2].make,
+                ' ',
+                this.props.cars[2].model
+              ),
+              React.createElement(
+                'p',
+                null,
+                React.createElement(
+                  'strong',
+                  null,
+                  'Certified'
+                ),
+                ' pre-owned!'
+              ),
+              React.createElement(
+                'p',
+                null,
+                '3.6L V6 - Manual transmission'
+              ),
+              React.createElement(
+                'p',
+                null,
+                'Rubicon - Sports package w/ offroad tires'
+              ),
+              React.createElement(
+                'p',
+                null,
+                this.props.cars[2].miles,
+                ' miles!'
+              ),
+              React.createElement(
+                Link,
+                { to: '/inventory/' + this.props.cars[2].make + '/' + this.props.cars[2].vin + '/' + this.props.cars[2].model },
+                'FIND OUT INTERNET PRICE'
+              )
+            )
+          )
+        )
+      ),
+      React.createElement(
+        'div',
+        { className: 'row' },
+        React.createElement(
+          'div',
+          { className: 'col-md-4' },
+          React.createElement(
+            'div',
+            { className: 'thumbnail' },
+            React.createElement('img', { src: this.props.cars[3].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              'div',
+              { className: 'caption' },
+              React.createElement(
+                'h3',
+                null,
+                this.props.cars[3].year,
+                ' - ',
+                this.props.cars[3].make,
+                ' ',
+                this.props.cars[3].model
+              ),
+              React.createElement(
+                'p',
+                null,
+                'Brand ',
+                React.createElement(
+                  'strong',
+                  null,
+                  'NEW'
+                ),
+                '!!'
+              ),
+              React.createElement(
+                'p',
+                null,
+                '2.5L V4 - Automatic transmission'
+              ),
+              React.createElement(
+                'p',
+                null,
+                'SE-R Spec V'
+              ),
+              React.createElement(
+                'p',
+                null,
+                this.props.cars[3].miles,
+                ' miles!'
+              ),
+              React.createElement(
+                Link,
+                { to: '/inventory/' + this.props.cars[3].make + '/' + this.props.cars[3].vin + '/' + this.props.cars[3].model },
+                'FIND OUT INTERNET PRICE'
+              )
+            )
+          )
+        ),
+        React.createElement(
+          'div',
+          { className: 'col-md-4' },
+          React.createElement(
+            'div',
+            { className: 'thumbnail' },
+            React.createElement('img', { src: this.props.cars[4].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              'div',
+              { className: 'caption' },
+              React.createElement(
+                'h3',
+                null,
+                this.props.cars[4].year,
+                ' - ',
+                this.props.cars[4].make,
+                ' ',
+                this.props.cars[4].model
+              ),
+              React.createElement(
+                'p',
+                null,
+                React.createElement(
+                  'strong',
+                  null,
+                  'Certified'
+                ),
+                ' pre-owned!'
+              ),
+              React.createElement(
+                'p',
+                null,
+                '3.5L V6 - Manual transmission'
+              ),
+              React.createElement(
+                'p',
+                null,
+                'SE Limited'
+              ),
+              React.createElement(
+                'p',
+                null,
+                this.props.cars[4].miles,
+                ' miles!'
+              ),
+              React.createElement(
+                Link,
+                { to: '/inventory/' + this.props.cars[4].make + '/' + this.props.cars[4].vin + '/' + this.props.cars[4].model },
+                'FIND OUT INTERNET PRICE'
+              )
+            )
+          )
+        ),
+        React.createElement(
+          'div',
+          { className: 'col-md-4' },
+          React.createElement(
+            'div',
+            { className: 'thumbnail' },
+            React.createElement('img', { src: this.props.cars[5].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              'div',
+              { className: 'caption' },
+              React.createElement(
+                'h3',
+                null,
+                this.props.cars[5].year,
+                ' - ',
+                this.props.cars[5].make,
+                ' ',
+                this.props.cars[5].model
+              ),
+              React.createElement(
+                'p',
+                null,
+                React.createElement(
+                  'strong',
+                  null,
+                  'Certified'
+                ),
+                ' pre-owned!'
+              ),
+              React.createElement(
+                'p',
+                null,
+                '1.8L V4 - Automatic transmission'
+              ),
+              React.createElement(
+                'p',
+                null,
+                'LS'
+              ),
+              React.createElement(
+                'p',
+                null,
+                this.props.cars[5].miles,
+                ' miles!'
+              ),
+              React.createElement(
+                Link,
+                { to: '/inventory/' + this.props.cars[5].make + '/' + this.props.cars[5].vin + '/' + this.props.cars[5].model },
+                'FIND OUT INTERNET PRICE'
+              )
+            )
+          )
+        )
+      ),
+      React.createElement(
+        'div',
+        { className: 'car-box-menu' },
+        React.createElement(
+          'div',
+          { className: 'row' },
+          React.createElement(
+            'div',
+            { className: 'col-md-offset-2 col-md-8' },
+            React.createElement(
+              'ul',
+              null,
+              React.createElement(
+                'li',
+                { className: 'new-car' },
+                React.createElement(
+                  'a',
+                  { href: '#' },
+                  React.createElement(
+                    'div',
+                    { className: 'box' },
+                    React.createElement(
+                      'div',
+                      { className: 'box-text' },
+                      React.createElement(
+                        'h4',
+                        null,
+                        'BROWSE'
+                      ),
+                      React.createElement(
+                        'p',
+                        null,
+                        'NEW'
                       )
                     )
                   )
-                ), 
-                React.createElement("li", {className: "used-car"}, 
-                  React.createElement("a", {href: "#"}, 
-                    React.createElement("div", {className: "box"}, 
-                      React.createElement("div", {className: "box-text"}, 
-                        React.createElement("h4", null, "BROWSE"), 
-                        React.createElement("p", null, "PREOWNED")
+                )
+              ),
+              React.createElement(
+                'li',
+                { className: 'used-car' },
+                React.createElement(
+                  'a',
+                  { href: '#' },
+                  React.createElement(
+                    'div',
+                    { className: 'box' },
+                    React.createElement(
+                      'div',
+                      { className: 'box-text' },
+                      React.createElement(
+                        'h4',
+                        null,
+                        'BROWSE'
+                      ),
+                      React.createElement(
+                        'p',
+                        null,
+                        'PREOWNED'
                       )
                     )
                   )
-                ), 
-                React.createElement("li", {className: "service"}, 
-                  React.createElement("a", {href: "#"}, 
-                    React.createElement("div", {className: "box"}, 
-                      React.createElement("div", {className: "box-text"}, 
-                        React.createElement("h4", null, "SERVICE")
+                )
+              ),
+              React.createElement(
+                'li',
+                { className: 'service' },
+                React.createElement(
+                  'a',
+                  { href: '#' },
+                  React.createElement(
+                    'div',
+                    { className: 'box' },
+                    React.createElement(
+                      'div',
+                      { className: 'box-text' },
+                      React.createElement(
+                        'h4',
+                        null,
+                        'SERVICE'
                       )
                     )
                   )
@@ -27186,7 +28828,7 @@ var Index = React.createClass({displayName: "Index",
 module.exports = Index;
 
 
-},{"../components/featuredcar.jsx":267,"react":265,"react-router":107}],273:[function(require,module,exports){
+},{"../components/featuredcar.jsx":269,"react":267,"react-router":108}],275:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27207,99 +28849,275 @@ module.exports = Index;
 var React = require('react');
 var Link = require('react-router').Link;
 
-module.exports = React.createClass({displayName: "exports",
+module.exports = React.createClass({
+  displayName: 'exports',
 
-    render: function render() {
 
-        return (
-            React.createElement("html", null, 
-                React.createElement("head", null, 
-                    React.createElement("meta", {charSet: "utf-8"}), 
-                    React.createElement("title", null, "ZAuto | West Hollywood"), 
-                    React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"}), 
-                    React.createElement("link", {rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"}), 
-                    React.createElement("link", {rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/assets/owl.carousel.min.css"}), 
-                    React.createElement("link", {rel: "stylesheet", href: "http://lvh.me:8000/app.min.css"})
-                ), 
-                React.createElement("body", null, 
-                  React.createElement("div", null, 
-                    React.createElement("div", {className: "container"}, 
-                      React.createElement("nav", null, 
-                        React.createElement("div", {className: "container-fluid"}, 
-                          React.createElement("div", {className: "navbar-header"}, 
-                            React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", "data-target": "#auto-navbar", "aria-expanded": "false"}, 
-                              React.createElement("span", {className: "icon-bar"}), 
-                              React.createElement("span", {className: "icon-bar"}), 
-                              React.createElement("span", {className: "icon-bar"})
-                            )
-                          ), 
-                          React.createElement("div", {className: "collapse navbar-collapse", id: "auto-navbar"}, 
-                            React.createElement("ul", {className: "nav navbar-nav"}, 
-                              React.createElement("li", null, React.createElement(Link, {to: '/'}, "Home")), 
-                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Research")), 
-                              React.createElement("li", null, React.createElement("a", {href: "#"}, "New Inventory")), 
-                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Pre-Owned")), 
-                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Service")), 
-                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Contact Us"))
-                            ), 
-                            React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
-                              React.createElement("li", null, React.createElement("button", {className: "btn btn-default nav-btn"}, React.createElement("i", {className: "fa fa-comments-o", "aria-hidden": "true"}), " CHAT NOW")), 
-                              React.createElement("li", {className: "vertical-divider"}), 
-                              React.createElement("li", {className: "navbar-text"}, React.createElement("i", {className: "fa fa-phone", "aria-hidden": "true"}), " (877) 909-1919"), 
-                              React.createElement("li", {className: "vertical-divider"}), 
-                              React.createElement("li", {className: "navbar-text"}, React.createElement("i", {className: "fa fa-map-marker", "aria-hidden": "true"}), " ZAuto West Hollywood, CA")
-                            )
-                          )
-                        )
-                      ), 
-                      React.createElement("div", {className: "logo-landing"}, 
-                        React.createElement("img", {src: "https://salesdemo.dropinauto.com/images/logo-landing.png"}), 
-                        React.createElement("h1", null, "West Hollywood ", React.createElement("small", null, "ZAuto"))
+  render: function render() {
+
+    return React.createElement(
+      'html',
+      null,
+      React.createElement(
+        'head',
+        null,
+        React.createElement('meta', { charSet: 'utf-8' }),
+        React.createElement(
+          'title',
+          null,
+          'ZAuto | West Hollywood'
+        ),
+        React.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' }),
+        React.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
+        React.createElement('link', { rel: 'stylesheet', href: 'http://lvh.me:8000/app.min.css' })
+      ),
+      React.createElement(
+        'body',
+        null,
+        React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'div',
+            { className: 'container' },
+            React.createElement(
+              'nav',
+              null,
+              React.createElement(
+                'div',
+                { className: 'container-fluid' },
+                React.createElement(
+                  'div',
+                  { className: 'navbar-header' },
+                  React.createElement(
+                    'button',
+                    { type: 'button', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#auto-navbar', 'aria-expanded': 'false' },
+                    React.createElement('span', { className: 'icon-bar' }),
+                    React.createElement('span', { className: 'icon-bar' }),
+                    React.createElement('span', { className: 'icon-bar' })
+                  )
+                ),
+                React.createElement(
+                  'div',
+                  { className: 'collapse navbar-collapse', id: 'auto-navbar' },
+                  React.createElement(
+                    'ul',
+                    { className: 'nav navbar-nav' },
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        Link,
+                        { to: '/' },
+                        'Home'
                       )
-                    ), 
-                    React.createElement("div", {className: "full-width-border"}), 
-                    this.props.children, 
-                    React.createElement("footer", null, 
-                      React.createElement("div", {className: "row"}, 
-                        React.createElement("div", {className: "col-md-offset-3 col-md-6"}, 
-                          React.createElement("div", {className: "col-md-3 text-center footer-image"}, 
-                            React.createElement("img", {src: "https://salesdemo.dropinauto.com/images/logo-landing.png"})
-                          ), 
-                          React.createElement("div", {className: "col-md-3 text-center"}, 
-                            React.createElement("ul", null, 
-                              React.createElement("li", null, React.createElement("strong", null, "INVENTORY")), 
-                              React.createElement("li", null, React.createElement("a", {href: "#"}, "New Vehicles")), 
-                              React.createElement("li", null, React.createElement("a", {href: "#"}, "Pre-Owned Vehicles"))
-                            )
-                          ), 
-                          React.createElement("div", {className: "col-md-3 text-center"}, 
-                            React.createElement("ul", null, 
-                              React.createElement("li", null, React.createElement("strong", null, "FINANCING")), 
-                              React.createElement("li", null, React.createElement(Link, {to: '/credit-application'}, "Credit Application"))
-                            )
-                          ), 
-                          React.createElement("div", {className: "col-md-3 text-center"}, 
-                            React.createElement("ul", null, 
-                              React.createElement("li", null, React.createElement("strong", null, "CONTACT")), 
-                              React.createElement("li", null, "(877) 909-1919")
-                            )
-                          )
-                        )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'a',
+                        { href: '#' },
+                        'Research'
+                      )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'a',
+                        { href: '#' },
+                        'New Inventory'
+                      )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'a',
+                        { href: '#' },
+                        'Pre-Owned'
+                      )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'a',
+                        { href: '#' },
+                        'Service'
+                      )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'a',
+                        { href: '#' },
+                        'Contact Us'
                       )
                     )
-                  ), 
-                  React.createElement("script", {src: "https://code.jquery.com/jquery-2.2.4.min.js"}), 
-                  React.createElement("script", {src: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"}), 
-                  React.createElement("script", {src: "https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.6/owl.carousel.min.js"}), 
-                  React.createElement("script", {src: "http://lvh.me:8000/bundle.js"})
+                  ),
+                  React.createElement(
+                    'ul',
+                    { className: 'nav navbar-nav navbar-right' },
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'button',
+                        { className: 'btn btn-default nav-btn' },
+                        React.createElement('i', { className: 'fa fa-comments-o', 'aria-hidden': 'true' }),
+                        ' CHAT NOW'
+                      )
+                    ),
+                    React.createElement('li', { className: 'vertical-divider' }),
+                    React.createElement(
+                      'li',
+                      { className: 'navbar-text' },
+                      React.createElement('i', { className: 'fa fa-phone', 'aria-hidden': 'true' }),
+                      ' (877) 909-1919'
+                    ),
+                    React.createElement('li', { className: 'vertical-divider' }),
+                    React.createElement(
+                      'li',
+                      { className: 'navbar-text' },
+                      React.createElement('i', { className: 'fa fa-map-marker', 'aria-hidden': 'true' }),
+                      ' ZAuto West Hollywood, CA'
+                    )
+                  )
                 )
+              )
+            ),
+            React.createElement(
+              'div',
+              { className: 'logo-landing' },
+              React.createElement('img', { src: 'https://salesdemo.dropinauto.com/images/logo-landing.png' }),
+              React.createElement(
+                'h1',
+                null,
+                'West Hollywood ',
+                React.createElement(
+                  'small',
+                  null,
+                  'ZAuto'
+                )
+              )
             )
-        );
-    }
+          ),
+          React.createElement('div', { className: 'full-width-border' }),
+          this.props.children,
+          React.createElement(
+            'footer',
+            null,
+            React.createElement(
+              'div',
+              { className: 'row' },
+              React.createElement(
+                'div',
+                { className: 'col-md-offset-3 col-md-6' },
+                React.createElement(
+                  'div',
+                  { className: 'col-md-3 text-center footer-image' },
+                  React.createElement('img', { src: 'https://salesdemo.dropinauto.com/images/logo-landing.png' })
+                ),
+                React.createElement(
+                  'div',
+                  { className: 'col-md-3 text-center' },
+                  React.createElement(
+                    'ul',
+                    null,
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'strong',
+                        null,
+                        'INVENTORY'
+                      )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'a',
+                        { href: '#' },
+                        'New Vehicles'
+                      )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'a',
+                        { href: '#' },
+                        'Pre-Owned Vehicles'
+                      )
+                    )
+                  )
+                ),
+                React.createElement(
+                  'div',
+                  { className: 'col-md-3 text-center' },
+                  React.createElement(
+                    'ul',
+                    null,
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'strong',
+                        null,
+                        'FINANCING'
+                      )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        Link,
+                        { to: '/credit-application' },
+                        'Credit Application'
+                      )
+                    )
+                  )
+                ),
+                React.createElement(
+                  'div',
+                  { className: 'col-md-3 text-center' },
+                  React.createElement(
+                    'ul',
+                    null,
+                    React.createElement(
+                      'li',
+                      null,
+                      React.createElement(
+                        'strong',
+                        null,
+                        'CONTACT'
+                      )
+                    ),
+                    React.createElement(
+                      'li',
+                      null,
+                      '(877) 909-1919'
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+        React.createElement('script', { src: 'https://code.jquery.com/jquery-2.2.4.min.js' }),
+        React.createElement('script', { src: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js' }),
+        React.createElement('script', { src: 'http://lvh.me:8000/bundle.js' })
+      )
+    );
+  }
 });
 
 
-},{"react":265,"react-router":107}],274:[function(require,module,exports){
+},{"react":267,"react-router":108}],276:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27320,21 +29138,39 @@ module.exports = React.createClass({displayName: "exports",
 var Layout = require('./layout.jsx');
 var React = require('react');
 
-module.exports = React.createClass({displayName: "exports",
+module.exports = React.createClass({
+    displayName: 'exports',
 
-    onButtonClick: function() {
+
+    onButtonClick: function onButtonClick() {
         alert('I was rendered on server side but I am clickable because of client mounting!');
     },
 
     render: function render() {
 
-        return (
-            React.createElement(Layout, React.__spread({},  this.props), 
-                React.createElement("div", {id: "index"}, 
-                    React.createElement("h1", null, "Hello ", this.props.name, "!"), 
-                    React.createElement("button", {onClick: this.onButtonClick}, "Click Me"), 
-                    React.createElement("br", null), 
-                    React.createElement("a", {href: "/"}, "Click to go to an react-router rendered view")
+        return React.createElement(
+            Layout,
+            this.props,
+            React.createElement(
+                'div',
+                { id: 'index' },
+                React.createElement(
+                    'h1',
+                    null,
+                    'Hello ',
+                    this.props.name,
+                    '!'
+                ),
+                React.createElement(
+                    'button',
+                    { onClick: this.onButtonClick },
+                    'Click Me'
+                ),
+                React.createElement('br', null),
+                React.createElement(
+                    'a',
+                    { href: '/' },
+                    'Click to go to an react-router rendered view'
                 )
             )
         );
@@ -27342,7 +29178,7 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 
-},{"./layout.jsx":273,"react":265}],275:[function(require,module,exports){
+},{"./layout.jsx":275,"react":267}],277:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -27362,7 +29198,11 @@ module.exports = React.createClass({displayName: "exports",
 
 var React = require('react');
 var ReactRouter = require('react-router');
-var { browserHistory } = require('react-router');
+
+var _require = require('react-router');
+
+var browserHistory = _require.browserHistory;
+
 var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
 var IndexRoute = ReactRouter.IndexRoute;
@@ -27372,20 +29212,23 @@ var Index = require('../public/views/index.jsx');
 var CarDetail = require('../public/views/cardetail.jsx');
 var CreditAplication = require('../public/views/creditapp.jsx');
 
-
 // something like local:8000/new-cars/toyota/${car-vin}/red-2016-prius
 
-var routes = module.exports = (
-    React.createElement(Router, {history: browserHistory}, 
-        React.createElement(Route, {path: "/", component: Layout}, 
-            React.createElement(IndexRoute, {component: Index}), 
-            React.createElement(Route, {path: "inventory"}, 
-              React.createElement(Route, {path: ":make/:vin/:model", component: CarDetail})
-            ), 
-            React.createElement(Route, {path: "credit-application", component: CreditAplication})
-        )
+var routes = module.exports = React.createElement(
+    Router,
+    { history: browserHistory },
+    React.createElement(
+        Route,
+        { path: '/', component: Layout },
+        React.createElement(IndexRoute, { component: Index }),
+        React.createElement(
+            Route,
+            { path: 'inventory' },
+            React.createElement(Route, { path: ':make/:vin/:model', component: CarDetail })
+        ),
+        React.createElement(Route, { path: 'credit-application', component: CreditAplication })
     )
 );
 
 
-},{"../public/views/cardetail.jsx":269,"../public/views/creditapp.jsx":271,"../public/views/index.jsx":272,"../public/views/layout.jsx":273,"react":265,"react-router":107}]},{},[268]);
+},{"../public/views/cardetail.jsx":271,"../public/views/creditapp.jsx":273,"../public/views/index.jsx":274,"../public/views/layout.jsx":275,"react":267,"react-router":108}]},{},[270]);

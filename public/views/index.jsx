@@ -6,15 +6,6 @@ var Link = require('react-router').Link;
 
 var Index = React.createClass({
 
-  componentDidMount: function() {
-    $("#featured-cars").owlCarousel({
-      items: 1,
-      autoplay: true,
-      stopOnHover: true,
-      navigation: true
-    });
-  },
-
   render: function() {
     return (
       <div className='container main-content'>
