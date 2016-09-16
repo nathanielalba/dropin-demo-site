@@ -24,7 +24,12 @@ module.exports = function CarsModel() {
             title: 'Clear'
           },
           {
-            images: ['https://upload.wikimedia.org/wikipedia/commons/b/be/Hyundai_Santa_Fe_front_20080326.jpg'],
+            images: [
+              'https://upload.wikimedia.org/wikipedia/commons/b/be/Hyundai_Santa_Fe_front_20080326.jpg',
+              'http://starmoz.com/images/hyundai-santa-fe-2008-9.jpg',
+              'http://starmoz.com/images/hyundai-santa-fe-2008-11.jpg',
+              'http://carphotos.cardomain.com/images/0016/57/69/16157596_large.jpg'
+            ],
             vin: 'WAUAC48H53K028590',
             make: 'Hyundai',
             model: 'Santa Fe',
@@ -39,7 +44,12 @@ module.exports = function CarsModel() {
             title: 'Rebuilt'
           },
           {
-            images: ['http://pictures.topspeed.com/IMG/crop/201404/jeep-wrangler-maximu_1600x0w.jpg'],
+            images: [
+              'http://pictures.topspeed.com/IMG/crop/201404/jeep-wrangler-maximu_1600x0w.jpg',
+              'http://autobrend.com/wp-content/uploads/2014/11/2014-Jeep-Wrangler-Interior2.jpg',
+              'https://www.carsbase.com/photo/Jeep-Wrangler_Polar_Edition_mp26_pic_108550.jpg',
+              'http://images.gtcarlot.com/pictures/98115583.jpg'
+            ],
             vin: 'JM1BK344661532731',
             make: 'Jeep',
             model: 'Wrangler',
@@ -54,7 +64,12 @@ module.exports = function CarsModel() {
             title: 'Clear'
           },
           {
-            images: ['http://autonxt.net/wp-content/uploads/2016/02/2016-Nissan-Sentra19.jpg'],
+            images: [
+              'http://autonxt.net/wp-content/uploads/2016/02/2016-Nissan-Sentra19.jpg',
+              'http://motoringcrunch.com/wp-content/uploads/2016/02/2016-Nissan-Maxima.jpg',
+              'http://www.nissanusa.com/content/dam/nissan/vehicles/2016/sentra/fb-share.jpg',
+              'https://i.ytimg.com/vi/Epjj-jTPUDQ/maxresdefault.jpg'
+            ],
             vin: '3FAFP06Z26R113023',
             make: 'Nissan',
             model: 'Sentra',
@@ -69,7 +84,12 @@ module.exports = function CarsModel() {
             title: 'Clear'
           },
           {
-            images: ['https://upload.wikimedia.org/wikipedia/commons/4/4f/2011_Ford_Edge_--_09-28-2011.jpg'],
+            images: [
+              'https://upload.wikimedia.org/wikipedia/commons/4/4f/2011_Ford_Edge_--_09-28-2011.jpg',
+              'https://i.ytimg.com/vi/SkEHKZbGYm0/maxresdefault.jpg',
+              'http://www.blogcdn.com/www.autoblog.com/media/2010/03/edgesportride---01opt.jpg',
+              'http://st.motortrend.com/uploads/sites/5/2010/08/2011-ford-edge-SEL-rear-three-quarter-static.jpg'
+            ],
             vin: '1C3CDFBB7FD242356',
             make: 'Ford',
             model: 'Edge',
@@ -84,7 +104,12 @@ module.exports = function CarsModel() {
             title: 'Clear'
           },
           {
-            images: ['https://upload.wikimedia.org/wikipedia/commons/0/09/2011_Chevrolet_Cruze_LS_--_NHTSA_2.jpg'],
+            images: [
+              'https://upload.wikimedia.org/wikipedia/commons/0/09/2011_Chevrolet_Cruze_LS_--_NHTSA_2.jpg',
+              'http://media.caranddriver.com/images/08q4/267373/2009-ford-edge-photo-234468-s-429x262.jpg',
+              'http://www.drivearabia.com/news/wp-content/uploads/2010/11/2011-ford-edge-dubai.jpg',
+              'http://img.autobytel.com//2012/ford/edge/2-550-oemexteriorfront-66801.jpg'
+            ],
             vin: '1N4DL01D6XC209154',
             make: 'Chevy',
             model: 'Cruze LS',
