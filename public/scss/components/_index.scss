@@ -1,10 +1,28 @@
 .main-content {
   margin-top: 5rem;
-  height: 115rem;
+  height: 117rem;
 }
 
 .thumbnail {
   img {
     height: 22.5rem;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .main-content {
+    height: 300rem;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .main-content {
+    height: 320rem;
+  }
+}
+
+@media only screen and (max-width: 524px) {
+  .main-content {
+    height: 340rem;
   }
 }

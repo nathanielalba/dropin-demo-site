@@ -17,3 +17,25 @@ ul.nav {
   border-left: 1px solid #f2f2f2;
   border-right: 1px solid #fff;
 }
+
+.navbar-header {
+
+  .navbar-toggle {
+    margin-top: 2rem;
+    .icon-bar {
+      background-color: #1abc9c;
+    }
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .mobile-nav-logo {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .logo-landing {
+    display: none;
+  }
+}

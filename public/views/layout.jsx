@@ -42,6 +42,11 @@ module.exports = React.createClass({
                               <span className='icon-bar'></span>
                               <span className='icon-bar'></span>
                             </button>
+                            <Link to={'/'}>
+                              <div className='mobile-nav-logo'>
+                                <img src='https://salesdemo.dropinauto.com/images/logo-landing.png' />
+                              </div>
+                            </Link>
                           </div>
                           <div className='collapse navbar-collapse' id='auto-navbar'>
                             <ul className='nav navbar-nav'>
@@ -72,23 +77,23 @@ module.exports = React.createClass({
                     <footer>
                       <div className='row'>
                         <div className='col-md-offset-3 col-md-6'>
-                          <div className='col-md-3 text-center footer-image'>
+                          <div className='col-xs-3 col-md-3 text-center footer-image'>
                             <img src='https://salesdemo.dropinauto.com/images/logo-landing.png' />
                           </div>
-                          <div className='col-md-3 text-center'>
+                          <div className='col-xs-3 col-md-3 text-center'>
                             <ul>
                               <li><strong>INVENTORY</strong></li>
                               <li><a href='#'>New Vehicles</a></li>
                               <li><a href='#'>Pre-Owned Vehicles</a></li>
                             </ul>
                           </div>
-                          <div className='col-md-3 text-center'>
+                          <div className='col-xs-3 col-md-3 text-center'>
                             <ul>
                               <li><strong>FINANCING</strong></li>
                               <li><Link to={'/credit-application'}>Credit Application</Link></li>
                             </ul>
                           </div>
-                          <div className='col-md-3 text-center'>
+                          <div className='col-xs-3 col-md-3 text-center'>
                             <ul>
                               <li><strong>CONTACT</strong></li>
                               <li>(877) 909-1919</li>

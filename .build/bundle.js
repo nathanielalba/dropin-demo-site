@@ -28895,6 +28895,15 @@ module.exports = React.createClass({
                     React.createElement('span', { className: 'icon-bar' }),
                     React.createElement('span', { className: 'icon-bar' }),
                     React.createElement('span', { className: 'icon-bar' })
+                  ),
+                  React.createElement(
+                    Link,
+                    { to: '/' },
+                    React.createElement(
+                      'div',
+                      { className: 'mobile-nav-logo' },
+                      React.createElement('img', { src: 'https://salesdemo.dropinauto.com/images/logo-landing.png' })
+                    )
                   )
                 ),
                 React.createElement(
@@ -29018,12 +29027,12 @@ module.exports = React.createClass({
                 { className: 'col-md-offset-3 col-md-6' },
                 React.createElement(
                   'div',
-                  { className: 'col-md-3 text-center footer-image' },
+                  { className: 'col-xs-3 col-md-3 text-center footer-image' },
                   React.createElement('img', { src: 'https://salesdemo.dropinauto.com/images/logo-landing.png' })
                 ),
                 React.createElement(
                   'div',
-                  { className: 'col-md-3 text-center' },
+                  { className: 'col-xs-3 col-md-3 text-center' },
                   React.createElement(
                     'ul',
                     null,
@@ -29058,7 +29067,7 @@ module.exports = React.createClass({
                 ),
                 React.createElement(
                   'div',
-                  { className: 'col-md-3 text-center' },
+                  { className: 'col-xs-3 col-md-3 text-center' },
                   React.createElement(
                     'ul',
                     null,
@@ -29084,7 +29093,7 @@ module.exports = React.createClass({
                 ),
                 React.createElement(
                   'div',
-                  { className: 'col-md-3 text-center' },
+                  { className: 'col-xs-3 col-md-3 text-center' },
                   React.createElement(
                     'ul',
                     null,
