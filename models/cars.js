@@ -21,7 +21,8 @@ module.exports = function CarsModel() {
             transmission: 'Automatic',
             engine: '2.5L V4',
             fuel: 'Gasoline',
-            title: 'Clear'
+            title: 'Clear',
+            carPackage: 'LE'
           },
           {
             images: [
@@ -41,7 +42,8 @@ module.exports = function CarsModel() {
             transmission: 'Automatic',
             engine: '2.7L V6',
             fuel: 'Gasoline',
-            title: 'Rebuilt'
+            title: 'Rebuilt',
+            carPackage: 'Limited'
           },
           {
             images: [
@@ -61,7 +63,8 @@ module.exports = function CarsModel() {
             transmission: 'Manual',
             engine: '3.6L V6',
             fuel: 'Gasoline',
-            title: 'Clear'
+            title: 'Clear',
+            carPackage: 'Rubicon w/ off-road'
           },
           {
             images: [
@@ -81,7 +84,8 @@ module.exports = function CarsModel() {
             transmission: 'Automatic',
             engine: '2.5L V4',
             fuel: 'Gasoline',
-            title: 'Clear'
+            title: 'Clear',
+            carPackage: 'FE+ S'
           },
           {
             images: [
@@ -101,7 +105,8 @@ module.exports = function CarsModel() {
             transmission: 'Manual',
             engine: '3.5L V6',
             fuel: 'Gasoline',
-            title: 'Clear'
+            title: 'Clear',
+            carPackage: 'SEL'
           },
           {
             images: [
@@ -112,7 +117,7 @@ module.exports = function CarsModel() {
             ],
             vin: '1N4DL01D6XC209154',
             make: 'Chevy',
-            model: 'Cruze LS',
+            model: 'Cruze',
             year: 2011,
             featured: true,
             preowned: true,
@@ -121,7 +126,8 @@ module.exports = function CarsModel() {
             transmission: 'Automatic',
             engine: '1.8L V4',
             fuel: 'Gasoline',
-            title: 'Clear'
+            title: 'Clear',
+            carPackage: 'LS Automatic'
           }
         ]
     };

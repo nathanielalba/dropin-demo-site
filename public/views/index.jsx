@@ -1,8 +1,7 @@
 var React = require('react');
-
-var FeaturedCar = require('../components/featuredcar.jsx');
-
 var Link = require('react-router').Link;
+
+var BoxMenu = require('./boxmenu.jsx');
 
 var Index = React.createClass({
 
@@ -91,43 +90,7 @@ var Index = React.createClass({
             </div>
           </div>
         </div>
-        <div className='car-box-menu'>
-          <div className='row'>
-            <div className='col-md-offset-2 col-md-8'>
-              <ul>
-                <li className='new-car'>
-                  <a href='#'>
-                    <div className='box'>
-                      <div className='box-text'>
-                        <h4>BROWSE</h4>
-                        <p>NEW</p>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li className='used-car'>
-                  <a href='#'>
-                    <div className='box'>
-                      <div className='box-text'>
-                        <h4>BROWSE</h4>
-                        <p>PREOWNED</p>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li className='service'>
-                  <a href='#'>
-                    <div className='box'>
-                      <div className='box-text'>
-                        <h4>SERVICE</h4>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <BoxMenu />
       </div>
     );
   }

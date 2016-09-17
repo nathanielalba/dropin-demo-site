@@ -7,7 +7,7 @@ var CreditApp = React.createClass({
     e.preventDefault();
 
     setTimeout(function() {
-      $('.credit-submit-form').modal('hide');
+      $('#thank-you-modal').modal('hide');
       Router.browserHistory.push('/');
     }, 7000);
   },
@@ -76,14 +76,13 @@ var CreditApp = React.createClass({
                 </div>
               </div>
             </div>
-            <button type='submit' className='btn btn-default' data-toggle='modal' data-target='.credit-submit-form'>Submit</button>
+            <button type='submit' className='btn btn-default' data-toggle='modal' data-target='.credit-submit-form' data-backdrop='static' data-keyboard='false'>Submit</button>
           </form>
         </div>
-        <div className='modal fade credit-submit-form' tabindex='-1' role='dialog' aria-labelleby='CreditSubmit'>
+        <div className='modal fade credit-submit-form' tabIndex='-1' role='dialog' aria-labelleby='CreditSubmit' id='thank-you-modal'>
           <div className='modal-dialog modal-lg' role='document'>
             <div className='modal-content'>
               <div className='modal-header'>
-                <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
                 <h3 className='modal-title'>ZAuto | West Hollywood</h3>
               </div>
               <div className='modal-body'>

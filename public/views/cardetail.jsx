@@ -31,8 +31,6 @@ var CarDetail = React.createClass({
         fuel: car.fuel,
         title: car.title
       }
-    }, function() {
-      console.log(this.state)
     });
   },
   render: function() {
@@ -73,7 +71,7 @@ var CarDetail = React.createClass({
                 <input type='email' className='form-control' placeholder='Email **' />
               </div>
               <div className='form-group'>
-                <textarea className='form-control' value={'I am interested in the ' + this.state.car.year + ' ' + this.state.car.make + ' ' + this.state.car.model + ' VIN#' + this.state.car.vin}></textarea>
+                <textarea className='form-control' defaultValue={'I am interested in the ' + this.state.car.year + ' ' + this.state.car.make + ' ' + this.state.car.model + ' VIN#' + this.state.car.vin}></textarea>
               </div>
               <button type='submit' className='btn btn-default btn-block'>Contact Us</button>
             </form>
