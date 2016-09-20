@@ -27927,7 +27927,7 @@ var Client = require('react-engine/lib/client');
 // Include all view files. Browerify doesn't do
 // this automatically as it can only operate on
 // static require statements.
-require('./views/boxmenu.jsx');require('./views/cardetail.jsx');require('./views/carlist.jsx');require('./views/creditapp.jsx');require('./views/footer.jsx');require('./views/index.jsx');require('./views/layout.jsx');require('./views/navbar.jsx');require('./views/newcar.jsx');require('./views/preownedcar.jsx');require('./views/server.jsx');
+require('./views/boxmenu.jsx');require('./views/cardetail.jsx');require('./views/carlist.jsx');require('./views/creditapp.jsx');require('./views/footer.jsx');require('./views/index.jsx');require('./views/layout.jsx');require('./views/navbar.jsx');require('./views/server.jsx');
 
 // boot options
 var options = {
@@ -27944,7 +27944,7 @@ document.addEventListener('DOMContentLoaded', function onLoad() {
 });
 
 
-},{"../routes/react.jsx":281,"./views/boxmenu.jsx":270,"./views/cardetail.jsx":271,"./views/carlist.jsx":272,"./views/creditapp.jsx":273,"./views/footer.jsx":274,"./views/index.jsx":275,"./views/layout.jsx":276,"./views/navbar.jsx":277,"./views/newcar.jsx":278,"./views/preownedcar.jsx":279,"./views/server.jsx":280,"react-engine/lib/client":76}],270:[function(require,module,exports){
+},{"../routes/react.jsx":279,"./views/boxmenu.jsx":270,"./views/cardetail.jsx":271,"./views/carlist.jsx":272,"./views/creditapp.jsx":273,"./views/footer.jsx":274,"./views/index.jsx":275,"./views/layout.jsx":276,"./views/navbar.jsx":277,"./views/server.jsx":278,"react-engine/lib/client":76}],270:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28590,7 +28590,11 @@ var Index = React.createClass({
           React.createElement(
             'div',
             { className: 'thumbnail' },
-            React.createElement('img', { src: this.props.cars[0].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              Link,
+              { to: '/inventory/' + this.props.cars[0].make + '/' + this.props.cars[0].vin + '/' + this.props.cars[0].model },
+              React.createElement('img', { src: this.props.cars[0].images[0], alt: 'Card image cap' })
+            ),
             React.createElement(
               'div',
               { className: 'caption' },
@@ -28644,7 +28648,11 @@ var Index = React.createClass({
           React.createElement(
             'div',
             { className: 'thumbnail' },
-            React.createElement('img', { src: this.props.cars[1].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              Link,
+              { to: '/inventory/' + this.props.cars[1].make + '/' + this.props.cars[1].vin + '/' + this.props.cars[1].model },
+              React.createElement('img', { src: this.props.cars[1].images[0], alt: 'Card image cap' })
+            ),
             React.createElement(
               'div',
               { className: 'caption' },
@@ -28697,7 +28705,11 @@ var Index = React.createClass({
           React.createElement(
             'div',
             { className: 'thumbnail' },
-            React.createElement('img', { src: this.props.cars[2].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              Link,
+              { to: '/inventory/' + this.props.cars[2].make + '/' + this.props.cars[2].vin + '/' + this.props.cars[2].model },
+              React.createElement('img', { src: this.props.cars[2].images[0], alt: 'Card image cap' })
+            ),
             React.createElement(
               'div',
               { className: 'caption' },
@@ -28754,7 +28766,11 @@ var Index = React.createClass({
           React.createElement(
             'div',
             { className: 'thumbnail' },
-            React.createElement('img', { src: this.props.cars[3].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              Link,
+              { to: '/inventory/' + this.props.cars[3].make + '/' + this.props.cars[3].vin + '/' + this.props.cars[3].model },
+              React.createElement('img', { src: this.props.cars[3].images[0], alt: 'Card image cap' })
+            ),
             React.createElement(
               'div',
               { className: 'caption' },
@@ -28808,7 +28824,11 @@ var Index = React.createClass({
           React.createElement(
             'div',
             { className: 'thumbnail' },
-            React.createElement('img', { src: this.props.cars[4].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              Link,
+              { to: '/inventory/' + this.props.cars[4].make + '/' + this.props.cars[4].vin + '/' + this.props.cars[4].model },
+              React.createElement('img', { src: this.props.cars[4].images[0], alt: 'Card image cap' })
+            ),
             React.createElement(
               'div',
               { className: 'caption' },
@@ -28861,7 +28881,11 @@ var Index = React.createClass({
           React.createElement(
             'div',
             { className: 'thumbnail' },
-            React.createElement('img', { src: this.props.cars[5].images[0], alt: 'Card image cap' }),
+            React.createElement(
+              Link,
+              { to: '/inventory/' + this.props.cars[5].make + '/' + this.props.cars[5].vin + '/' + this.props.cars[5].model },
+              React.createElement('img', { src: this.props.cars[5].images[0], alt: 'Card image cap' })
+            ),
             React.createElement(
               'div',
               { className: 'caption' },
@@ -29142,148 +29166,6 @@ module.exports = Navbar;
 
 
 },{"react":267,"react-router":108}],278:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var Link = require('react-router').Link;
-
-var NewCar = React.createClass({
-  displayName: 'NewCar',
-
-  render: function render() {
-    return React.createElement(
-      'div',
-      { className: 'thumbnail' },
-      React.createElement('img', { src: this.props.images[0], alt: 'Car Photo' }),
-      React.createElement(
-        'div',
-        { className: 'caption' },
-        React.createElement(
-          'h3',
-          null,
-          this.props.year,
-          ' - ',
-          this.props.make,
-          ' ',
-          this.props.model
-        ),
-        React.createElement(
-          'p',
-          null,
-          'Brand ',
-          React.createElement(
-            'strong',
-            null,
-            'New'
-          ),
-          '!!'
-        ),
-        React.createElement(
-          'p',
-          null,
-          this.props.engine,
-          ' - ',
-          this.props.transmission,
-          ' transmission'
-        ),
-        React.createElement(
-          'p',
-          null,
-          this.props.carPackage,
-          ' ',
-          'package'
-        ),
-        React.createElement(
-          'p',
-          null,
-          this.props.miles,
-          ' miles!'
-        ),
-        React.createElement(
-          Link,
-          { to: '/inventory/' + this.props.make + this.props.vin + this.props.model },
-          'FIND OUT INTERNET PRICES!!'
-        )
-      )
-    );
-  }
-});
-
-module.exports = NewCar;
-
-
-},{"react":267,"react-router":108}],279:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var Link = require('react-router').Link;
-
-var PreownedCar = React.createClass({
-  displayName: 'PreownedCar',
-
-  render: function render() {
-    return React.createElement(
-      'div',
-      { className: 'thumbnail' },
-      React.createElement('img', { src: this.props.images[0], alt: 'Car Photo' }),
-      React.createElement(
-        'div',
-        { className: 'caption' },
-        React.createElement(
-          'h3',
-          null,
-          this.props.year,
-          ' - ',
-          this.props.make,
-          ' ',
-          this.props.model
-        ),
-        React.createElement(
-          'p',
-          null,
-          'Brand ',
-          React.createElement(
-            'strong',
-            null,
-            'New'
-          ),
-          '!!'
-        ),
-        React.createElement(
-          'p',
-          null,
-          this.props.engine,
-          ' - ',
-          this.props.transmission,
-          ' transmission'
-        ),
-        React.createElement(
-          'p',
-          null,
-          this.props.carPackage,
-          ' ',
-          'package'
-        ),
-        React.createElement(
-          'p',
-          null,
-          this.props.miles,
-          ' miles!'
-        ),
-        React.createElement(
-          Link,
-          { to: '/inventory/' + this.props.make + this.props.vin + this.props.model },
-          'FIND OUT INTERNET PRICES!!'
-        )
-      )
-    );
-  }
-});
-
-module.exports = PreownedCar;
-
-
-},{"react":267,"react-router":108}],280:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |
@@ -29344,7 +29226,7 @@ module.exports = React.createClass({
 });
 
 
-},{"./layout.jsx":276,"react":267}],281:[function(require,module,exports){
+},{"./layout.jsx":276,"react":267}],279:[function(require,module,exports){
 /*-------------------------------------------------------------------------------------------------------------------*\
  |  Copyright (C) 2015 PayPal                                                                                          |
  |                                                                                                                     |

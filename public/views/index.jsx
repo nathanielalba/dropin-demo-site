@@ -11,7 +11,9 @@ var Index = React.createClass({
         <div className='row'>
           <div className='col-md-4'>
             <div className="thumbnail">
-              <img src={this.props.cars[0].images[0]} alt="Card image cap" />
+              <Link to={'/inventory/' + this.props.cars[0].make + '/' +this.props.cars[0].vin + '/' + this.props.cars[0].model }>
+                <img src={this.props.cars[0].images[0]} alt="Card image cap" />
+              </Link>
               <div className="caption">
                 <h3>{this.props.cars[0].year} - {this.props.cars[0].make} {this.props.cars[0].model}</h3>
                 <p>Brand <strong>NEW</strong>!!</p>
@@ -24,7 +26,9 @@ var Index = React.createClass({
           </div>
           <div className='col-md-4'>
             <div className="thumbnail">
-              <img src={this.props.cars[1].images[0]} alt="Card image cap" />
+              <Link to={'/inventory/' + this.props.cars[1].make + '/' +this.props.cars[1].vin + '/' + this.props.cars[1].model }>
+                <img src={this.props.cars[1].images[0]} alt="Card image cap" />
+              </Link>
               <div className="caption">
                 <h3>{this.props.cars[1].year} - {this.props.cars[1].make} {this.props.cars[1].model}</h3>
                 <p><strong>Certified</strong> pre-owned!</p>
@@ -37,7 +41,9 @@ var Index = React.createClass({
           </div>
           <div className='col-md-4'>
             <div className="thumbnail">
-              <img src={this.props.cars[2].images[0]} alt="Card image cap" />
+              <Link to={'/inventory/' + this.props.cars[2].make + '/' +this.props.cars[2].vin + '/' + this.props.cars[2].model }>
+                <img src={this.props.cars[2].images[0]} alt="Card image cap" />
+              </Link>
               <div className="caption">
                 <h3>{this.props.cars[2].year} - {this.props.cars[2].make} {this.props.cars[2].model}</h3>
                 <p><strong>Certified</strong> pre-owned!</p>
@@ -52,7 +58,9 @@ var Index = React.createClass({
         <div className='row'>
           <div className='col-md-4'>
             <div className="thumbnail">
-              <img src={this.props.cars[3].images[0]} alt="Card image cap" />
+              <Link to={'/inventory/' + this.props.cars[3].make + '/' +this.props.cars[3].vin + '/' + this.props.cars[3].model }>
+                <img src={this.props.cars[3].images[0]} alt="Card image cap" />
+              </Link>
               <div className="caption">
                 <h3>{this.props.cars[3].year} - {this.props.cars[3].make} {this.props.cars[3].model}</h3>
                 <p>Brand <strong>NEW</strong>!!</p>
@@ -65,7 +73,9 @@ var Index = React.createClass({
           </div>
           <div className='col-md-4'>
             <div className="thumbnail">
-              <img src={this.props.cars[4].images[0]} alt="Card image cap" />
+              <Link to={'/inventory/' + this.props.cars[4].make + '/' +this.props.cars[4].vin + '/' + this.props.cars[4].model }>
+                <img src={this.props.cars[4].images[0]} alt="Card image cap" />
+              </Link>
               <div className="caption">
                 <h3>{this.props.cars[4].year} - {this.props.cars[4].make} {this.props.cars[4].model}</h3>
                 <p><strong>Certified</strong> pre-owned!</p>
@@ -78,7 +88,9 @@ var Index = React.createClass({
           </div>
           <div className='col-md-4'>
             <div className="thumbnail">
-              <img src={this.props.cars[5].images[0]} alt="Card image cap" />
+              <Link to={'/inventory/' + this.props.cars[5].make + '/' +this.props.cars[5].vin + '/' + this.props.cars[5].model }>
+                <img src={this.props.cars[5].images[0]} alt="Card image cap" />
+              </Link>
               <div className="caption">
                 <h3>{this.props.cars[5].year} - {this.props.cars[5].make} {this.props.cars[5].model}</h3>
                 <p><strong>Certified</strong> pre-owned!</p>
