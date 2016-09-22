@@ -28469,12 +28469,9 @@ var DropIn = React.createClass({
   handleLiveVideo: function handleLiveVideo(e) {
     e.preventDefault();
 
-    var dropInUrl = 'https://saledemo.dropinauto.com/dealer/' + 'dropininc' + '?' + 'vin=' + this.props.vin + '&refererUrl=' + window.location.href;
-
     console.log('Live video has started');
     console.log('Dealer code is', DealerCode);
-    console.log('This is your url', dropInUrl);
-    window.location.href = dropInUrl;
+    window.location.href = 'https://salesdemo.dropinauto.com/dealer/' + DealerCode + '?vin=' + this.props.vin + '&refererUrl=' + window.location.href;
   },
   render: function render() {
     return React.createElement(
