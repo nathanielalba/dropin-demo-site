@@ -33,6 +33,11 @@ var CarDetail = React.createClass({
       }
     });
   },
+  handleLiveVideo: function(e) {
+    e.preventDefault();
+
+    console.log('Live Video Started');
+  },
   render: function() {
     var images = [];
     this.state.car.images.map(function(data, id) {
@@ -60,6 +65,10 @@ var CarDetail = React.createClass({
               <p>CARFAX: <a href='#'>Click for a CarFax Check!</a></p>
               <h6>VIN#{this.state.car.vin}</h6>
               <h3>Internet Price: <strong>${this.state.car.price}</strong></h3>
+              <button className='live-video-button'>
+                  <img src='https://salesdemo.dropinauto.com/images/icon-dropin.png' />
+                  <span className='live-video-text'>LIVE VIDEO</span>
+              </button>
             </div>
           </div>
           <div className='detail-contact-form'>

@@ -28094,6 +28094,11 @@ var CarDetail = React.createClass({
       }
     });
   },
+  handleLiveVideo: function handleLiveVideo(e) {
+    e.preventDefault();
+
+    console.log('Live Video Started');
+  },
   render: function render() {
     var images = [];
     this.state.car.images.map(function (data, id) {
@@ -28184,6 +28189,16 @@ var CarDetail = React.createClass({
                 null,
                 '$',
                 this.state.car.price
+              )
+            ),
+            React.createElement(
+              'button',
+              { className: 'live-video-button' },
+              React.createElement('img', { src: 'https://salesdemo.dropinauto.com/images/icon-dropin.png' }),
+              React.createElement(
+                'span',
+                { className: 'live-video-text' },
+                'LIVE VIDEO'
               )
             )
           )
@@ -28978,6 +28993,7 @@ module.exports = React.createClass({
                 'head',
                 null,
                 React.createElement('meta', { charSet: 'utf-8' }),
+                React.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }),
                 React.createElement(
                     'title',
                     null,
