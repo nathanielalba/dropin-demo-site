@@ -1,4 +1,5 @@
 var React = require('react');
+var DropIn = require('./dropin.jsx');
 import ImageGallery from 'react-image-gallery';
 
 var CarDetail = React.createClass({
@@ -33,11 +34,6 @@ var CarDetail = React.createClass({
       }
     });
   },
-  handleLiveVideo: function(e) {
-    e.preventDefault();
-
-    console.log('Live Video Started');
-  },
   render: function() {
     var images = [];
     this.state.car.images.map(function(data, id) {
@@ -65,10 +61,7 @@ var CarDetail = React.createClass({
               <p>CARFAX: <a href='#'>Click for a CarFax Check!</a></p>
               <h6>VIN#{this.state.car.vin}</h6>
               <h3>Internet Price: <strong>${this.state.car.price}</strong></h3>
-              <button className='live-video-button'>
-                  <img src='https://salesdemo.dropinauto.com/images/icon-dropin.png' />
-                  <span className='live-video-text'>LIVE VIDEO</span>
-              </button>
+              <DropIn vin={this.state.car.vin}/>
             </div>
           </div>
           <div className='detail-contact-form'>
