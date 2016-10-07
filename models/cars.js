@@ -134,6 +134,73 @@ module.exports = function CarsModel() {
             title: 'Clear',
             carPackage: 'LS Automatic',
             tagline: '<strong>Certified</strong> pre-owned!'
+          },
+          {
+            images: [
+              'http://blog.caranddriver.com/wp-content/uploads/2014/11/2016-Toyota-Mirai-PLACEMENT-626x382.jpg',
+              'http://www.cedemos.org/wp-content/uploads/2014/12/toyota-mirai-hidr%C3%B3geno.jpg',
+              'http://file.kbb.com/kbb/vehicleimage/housenew/640x480/2016/2016-toyota-mirai-frontside_tomir1601.jpg',
+              'http://cdn.arstechnica.net/wp-content/uploads/sites/3/2015/10/MIRAI_EXT_01_DPL_UK-980x653.jpg'
+            ],
+            vin: 'JM1BL1UP4D1820319',
+            make: 'Toyota',
+            model: 'Mirai',
+            year: 2017,
+            featured: true,
+            preowned: false,
+            price: 57500,
+            miles: 5,
+            transmission: 'N/A',
+            engine: 'Electric',
+            fuel: 'N/A',
+            title: 'Clear',
+            carPackage: '245 V nickel-metal hydride',
+            tagline: '<strong>Fully</strong> electric car!!'
+          },
+          {
+            images: [
+              'https://i.ytimg.com/vi/vTX3QOAggJg/maxresdefault.jpg',
+              'http://www.gaadi.com/blog/wp-content/uploads/2013/10/bmw-i8.jpg',
+              'http://cdn.bmwblog.com/wp-content/uploads/2015/12/2015-BMW-i8-Test-Drive-1900x1200-2.jpg',
+              'http://cdn.bmwblog.com/wp-content/uploads/2015/12/2015-BMW-i8-Test-Drive-1900x1200-1.jpg',
+              'http://cdn.bmwblog.com/wp-content/uploads/2015/12/2015-BMW-i8-Test-Drive-1900x1200-30.jpg'
+            ],
+            vin: '2GCEC13T841306138',
+            make: 'BMW',
+            model: 'i8',
+            year: 2017,
+            featured: true,
+            preowned: false,
+            price: 140700,
+            miles: 23,
+            transmission: 'N/A',
+            engine: 'Electric',
+            fuel: 'N/A',
+            title: 'Clear',
+            carPackage: 'Luxury',
+            tagline: '<strong>Fully</strong> electric car!!'
+          },
+          {
+            images: [
+              'https://s-media-cache-ak0.pinimg.com/originals/c0/a8/91/c0a891a3752f04ad05b07b286cec7b32.jpg',
+              'https://www.carsbase.com/photo/Nissan-Nismo_GT_R__mp7_pic_107982.jpg',
+              'http://img0.gtsstatic.com/wallpapers/0f64ed99ce7cb2c44cc093a235d9255a_large.jpeg',
+              'http://www.nissanreference.com/colors/gtr/nissan_gtr_09_RAY_02.jpg?random=1402322820'
+            ],
+            vin: 'WBAPH5C56BF093907',
+            make: 'Nissan',
+            model: 'GT-R',
+            year: 2015,
+            featured: true,
+            preowned: true,
+            price: 128277,
+            miles: 45867,
+            transmission: 'Manual',
+            engine: 'V6 Twin Turbo 3.8 Liter',
+            fuel: 'Gasoline',
+            title: 'Rebuilt',
+            carPackage: 'NISMO',
+            tagline: '<strong>Strong</strong> racing car, recently rebuilt'
           }
         ]
     };

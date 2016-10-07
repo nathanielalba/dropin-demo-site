@@ -33716,6 +33716,10 @@ var CarListItem = React.createClass({
   render: function render() {
     var car = this.props.car;
     var altText = car.make + ' ' + car.model + ' display picture';
+
+    function setTagLine() {
+      return { __html: car.tagline };
+    };
     return React.createElement(
       'div',
       { className: 'thumbnail' },
@@ -33736,11 +33740,7 @@ var CarListItem = React.createClass({
           ' ',
           car.model
         ),
-        React.createElement(
-          'p',
-          null,
-          car.tagline
-        ),
+        React.createElement('p', { dangerouslySetInnerHTML: setTagLine() }),
         React.createElement(
           'p',
           null,
@@ -34141,7 +34141,7 @@ var Index = React.createClass({
       React.createElement(
         Masonry,
         {
-          className: 'car-list-items',
+          className: 'car-list',
           elementType: 'div',
           options: masonryOptions,
           disableImagesLoaded: false,

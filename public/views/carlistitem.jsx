@@ -4,7 +4,9 @@ var Link = require('react-router').Link;
 var CarListItem = React.createClass({
   render: function() {
     var car = this.props.car;
-    var altText = `${car.make} ${car.model} display picture`
+    var altText = `${car.make} ${car.model} display picture`;
+
+    function setTagLine() { return { __html: car.tagline }};
     return (
       <div className="thumbnail">
         <Link to={'/inventory/' + car.make + '/' + car.vin + '/' + car.model }>
@@ -12,7 +14,7 @@ var CarListItem = React.createClass({
         </Link>
         <div className="caption">
           <h3>{car.year} - {car.make} {car.model}</h3>
-          <p>{car.tagline}</p>
+          <p dangerouslySetInnerHTML={setTagLine()} />
           <p>{car.engine} - {car.transmission}</p>
           <p>{car.carPackage}</p>
           <p>{car.miles} miles!</p>

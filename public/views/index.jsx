@@ -20,7 +20,7 @@ var Index = React.createClass({
     return (
       <div className='container main-content'>
         <Masonry
-          className={'car-list-items'}
+          className={'car-list'}
           elementType={'div'}
           options={masonryOptions}
           disableImagesLoaded={false}

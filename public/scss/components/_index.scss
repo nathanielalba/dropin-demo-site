@@ -1,29 +1,39 @@
 .main-content {
   margin-top: 5rem;
-  height: 117rem;
+  height: 150rem;
 }
 
 .thumbnail {
-  width: 35rem;
+  width: 32%;
   img {
     height: 22.5rem;
   }
 }
 
 @media only screen and (max-width: 992px) {
+  .thumbnail {
+    width: 47.5%;
+  }
   .main-content {
-    height: 425rem;
+    height: 250rem;
   }
 }
 
 @media only screen and (max-width: 768px) {
+  .thumbnail {
+    width: 47.5%;
+    font-size: 75%;
+  }
   .main-content {
-    height: 475rem;
+    height: 210rem;
   }
 }
 
 @media only screen and (max-width: 574px) {
+  .thumbnail {
+    width: 100%;
+  }
   .main-content {
-    height: 420rem;
+    height: 500rem;
   }
 }
