@@ -22,7 +22,8 @@ module.exports = function CarsModel() {
             engine: '2.5L V4',
             fuel: 'Gasoline',
             title: 'Clear',
-            carPackage: 'LE'
+            carPackage: 'LE',
+            tagline: 'Brand <strong>NEW</strong>!!'
           },
           {
             images: [
@@ -43,7 +44,8 @@ module.exports = function CarsModel() {
             engine: '2.7L V6',
             fuel: 'Gasoline',
             title: 'Rebuilt',
-            carPackage: 'Limited'
+            carPackage: 'Limited',
+            tagline: '<strong>Certified</strong> pre-owned!'
           },
           {
             images: [
@@ -64,7 +66,8 @@ module.exports = function CarsModel() {
             engine: '3.6L V6',
             fuel: 'Gasoline',
             title: 'Clear',
-            carPackage: 'Rubicon w/ off-road'
+            carPackage: 'Rubicon w/ off-road',
+            tagline: '<strong>Certified</strong> pre-owned!'
           },
           {
             images: [
@@ -85,7 +88,8 @@ module.exports = function CarsModel() {
             engine: '2.5L V4',
             fuel: 'Gasoline',
             title: 'Clear',
-            carPackage: 'FE+ S'
+            carPackage: 'FE+ S',
+            tagline: 'Brand <strong>NEW</strong>!!'
           },
           {
             images: [
@@ -106,7 +110,8 @@ module.exports = function CarsModel() {
             engine: '3.5L V6',
             fuel: 'Gasoline',
             title: 'Clear',
-            carPackage: 'SEL'
+            carPackage: 'SEL',
+            tagline: '<strong>Certified</strong> pre-owned!'
           },
           {
             images: [
@@ -127,7 +132,8 @@ module.exports = function CarsModel() {
             engine: '1.8L V4',
             fuel: 'Gasoline',
             title: 'Clear',
-            carPackage: 'LS Automatic'
+            carPackage: 'LS Automatic',
+            tagline: '<strong>Certified</strong> pre-owned!'
           }
         ]
     };
