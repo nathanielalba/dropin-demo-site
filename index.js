@@ -32,7 +32,11 @@ options = {
          * Add any additional config setup or overrides here. `config` is an initialized
          * `confit` (https://github.com/krakenjs/confit/) configuration object.
          */
+<<<<<<< HEAD
         config.set('dealerCode', dealerCode);
+=======
+        config.set('placeholderCode', 'testvalue');
+>>>>>>> 11f2c4dad4df0d18f1ae3d3d65bd3376ede6a2a4
 
         next(null, config);
     }
