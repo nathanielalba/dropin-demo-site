@@ -20,6 +20,8 @@ var kraken = require('kraken-js');
 
 var options, app;
 
+var dealerCode = require('./lib/dropInConfig');
+
 /*
  * Create and configure application. Also exports application instance for use by tests.
  * See https://github.com/krakenjs/kraken-js#options for additional configuration options.
@@ -30,7 +32,7 @@ options = {
          * Add any additional config setup or overrides here. `config` is an initialized
          * `confit` (https://github.com/krakenjs/confit/) configuration object.
          */
-        config.set('dealerCode', 'ZAutoWestHollywood');
+        config.set('dealerCode', dealerCode);
 
         next(null, config);
     }
