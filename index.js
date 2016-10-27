@@ -30,7 +30,7 @@ options = {
          * Add any additional config setup or overrides here. `config` is an initialized
          * `confit` (https://github.com/krakenjs/confit/) configuration object.
          */
-        config.set('dealerCode', 'ZAutoWestHollywood');
+        config.set('placeholderCode', 'testvalue');
 
         next(null, config);
     }
