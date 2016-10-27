@@ -47,5 +47,5 @@ app.use(kraken(options));
 app.on('start', function () {
     console.log('Application ready to serve requests.');
     console.log('Environment: %s', app.kraken.get('env:env'));
-    console.log('Current Dealer Code is', app.kraken.get('dealerCode'));
+    console.log('test placeholderCode value is', app.kraken.get('placeholderCode'));
 });

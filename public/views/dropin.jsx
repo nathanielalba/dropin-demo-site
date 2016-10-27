@@ -1,6 +1,10 @@
 var React = require('react');
 
-var DealerCode = require('../../lib/dropInConfig.js').dealerCode;
+
+var config =  require('../../lib/dropInConfig.js');
+var DealerCode = config.dealerCode;
+var DropInAutoUrl = config.DropInAutoUrl;
+
 
 var DropIn = React.createClass({
   handleLiveVideo: function(e) {
