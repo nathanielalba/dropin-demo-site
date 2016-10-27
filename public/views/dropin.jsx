@@ -8,7 +8,8 @@ var DropIn = React.createClass({
 
     console.log('Live video has started');
     console.log('Dealer code is', DealerCode);
-    window.location.href = `https://autoqa.dropinauto.com/dealer/${DealerCode}?vin=${this.props.vin}&refererUrl=${window.location.href}`;
+    window.location.href = `${DropInAutoUrl}/${DealerCode}?vin=${this.props.vin}&refererUrl=${window.location.href}`;
+    console.log(window.location.href);
   },
   render: function() {
     return (
