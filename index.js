@@ -20,7 +20,7 @@ var kraken = require('kraken-js');
 
 var options, app;
 
-var dealerCode = require('./lib/dropInConfig');
+var globalVars = require('./lib');
 
 /*
  * Create and configure application. Also exports application instance for use by tests.
@@ -32,11 +32,8 @@ options = {
          * Add any additional config setup or overrides here. `config` is an initialized
          * `confit` (https://github.com/krakenjs/confit/) configuration object.
          */
-<<<<<<< HEAD
-        config.set('dealerCode', dealerCode);
-=======
+        config.set('globalVars', globalVars);
         config.set('placeholderCode', 'testvalue');
->>>>>>> 11f2c4dad4df0d18f1ae3d3d65bd3376ede6a2a4
 
         next(null, config);
     }
@@ -53,5 +50,5 @@ app.use(kraken(options));
 app.on('start', function () {
     console.log('Application ready to serve requests.');
     console.log('Environment: %s', app.kraken.get('env:env'));
-    console.log('Current Dealer Code is', app.kraken.get('dealerCode'));
+    console.log('Current Dealer Code is', app.kraken.get('globalVars').dealerCode);
 });

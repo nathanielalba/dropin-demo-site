@@ -61,7 +61,11 @@ var CarDetail = React.createClass({
               <p>CARFAX: <a href='#'>Click for a CarFax Check!</a></p>
               <h6>VIN#{this.state.car.vin}</h6>
               <h3>Internet Price: <strong>${this.state.car.price}</strong></h3>
-              <DropIn vin={this.state.car.vin}/>
+              <DropIn
+                vin={this.state.car.vin}
+                dealerCode={this.props.dealerCode}
+                dropInAutoUrl={this.props.DropInAutoUrl}
+              />
             </div>
           </div>
           <div className='detail-contact-form'>

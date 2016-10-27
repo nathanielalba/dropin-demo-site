@@ -10,6 +10,7 @@
   "dependencies": {
     "babel": "^6.5.2",
     "babel-register": "^6.14.0",
+    "confit": "^2.1.0",
     "construx": "~0.0.1",
     "construx-copier": "~0.0.1",
     "engine-munger": "^0.2.0",

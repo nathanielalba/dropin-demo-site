@@ -23,7 +23,8 @@ module.exports = function (router) {
     var model = new CarModel();
 
     router.get('*', function (req, res) {
-        res.render(req.url, model);
+        const globalVars = req.app.kraken.get('globalVars');
+        res.render(req.url, Object.assign(model, globalVars));
     });
 
 };
